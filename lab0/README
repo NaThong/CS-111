@@ -1,0 +1,47 @@
+NAME: Jeffrey Chan
+EMAIL: jeffschan97@gmail.com
+ID: 004611638
+
+Included Files:
+
+lab0.c - C program that copies its stdin to its stdout. Supports all options
+including --intput, --output, --segfault, and --catch.
+
+Makefile - Makefile that builds the lab0 executable. Supports a check target
+that runs the smoke test on the lab0 program, a clean target that removes
+unnecessary files, and a dist target that compresses submission files into
+a tarball file.
+
+backtrace.png - screenshot of stack backtrace after running executable in gdb
+with --segfault option
+
+breakpoint.png - screenshot of breakpoint at line that dereferences a null
+pointer and validation that it's a null pointer.
+
+Smoke-Test Cases:
+
+successTest - runs lab0 with a valid input to check if the program exits with
+code 0.
+
+unrecognizedTest - runs lab0 with argument --jeffrey to check if program can
+exits with code 1.
+
+inputTest - runs lab0 with an unreadable input file to check if program exits
+with code 2.
+
+outputTest - runs lab0 with an unwritable output file to check if program
+exits with code 3.
+
+segfaultTest - runs lab0 with just --segfault option to check if program exits
+with code 139 (segmentation fault).
+
+catchTest - runs lab0 with --segfault and --catch options to check if program
+exits with code 4.
+
+cmpTest - runs lab0 with valid input, then checks if input and output files
+are the same using the cmp command and checking if the exit code was 0.
+
+Resources:
+
+Example used to understand the getopt_long API
+https://www.gnu.org/software/libc/manual/html_node/Getopt-Long-Option-Example.html
