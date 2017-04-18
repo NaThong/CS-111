@@ -1,0 +1,20 @@
+NAME: Jeffrey Chan
+EMAIL: jeffschan97@gmail.com
+ID: 004-611-638
+
+Included Files:
+
+Makefile - Includes a default target for building the lab1a executable, a
+clean target for reverting the project back to it's installed state, and a
+dist target for compressing submission files into the distribution tarball file.
+
+lab1a.c - C source file that compiles in the program specified in the lab
+specification, and supports the shell option.
+
+Resources:
+
+Example for placing terminal in noncanonical input mode, without echo:
+https://www.gnu.org/software/libc/manual/html_node/Noncanon-Example.html#Noncanon-Example
+
+Example that helped me understand how to use the poll API:
+http://www.unixguide.net/unix/programming/2.1.2.shtml
