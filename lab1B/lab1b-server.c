@@ -56,9 +56,38 @@ void execShell() {
 }
 
 void readWrite(int socketFD) {
+    struct pollfd pollfdArray[2]; // array of pollfd strctures
+    pollfdArray[0].fd = socketFD; // first pollfd describes socket
+    pollfdArray[1].fd = pipeToParent[0]; // second pollfd describes pipe output
+    pollfdArray[0].events = POLLIN | POLLHUP | POLLERR;
+    pollfdArray[1].events = POLLIN | POLLHUP | POLLERR;
+
+    int returnValue;
     char buffer;
-    while (read(socketFD, &buffer, sizeof(char))) {
-        write(socketFD, &buffer, sizeof(char));
+
+    while (1) {
+        // do a poll and check for errors
+        returnValue = poll(pollfdArray, 2, 0);
+        if (returnValue < 0) {
+            fprintf(stderr, "error: error while polling\n");
+            exit(1);
+        }
+        
+        // if socketFD pollfd revents has POLLIN (has input to read)
+        if ((pollfdArray[0].revents & POLLIN)) {
+            int bytesRead = read(fd1, &buffer, sizeof(char)); // read from keyboard
+            write(pipeToChild[1], &buffer, sizeof(char));
+        }
+
+        // if shell pollfd has POLLIN (has output to read)
+        if ((pollfdArray[1].revents & POLLIN)) {
+            int bytesRead = read(pipeToParent[0], &buffer, sizeof(char)); // read from shell pipe
+            write(socketFD, &buffer, sizeof(char));
+        }
+
+        if ((pollfdArray[1].revents & (POLLHUP | POLLERR))) {
+            exit(0);    
+        }
     }
 }
 
