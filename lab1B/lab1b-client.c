@@ -47,6 +47,9 @@ void setInputMode() {
 
 int main(int argc, char *argv[]) {
     int option = 0; // used to hold option
+    struct hostent *server;
+    struct sockaddr_in serverAddress;
+    int portNumber;
 
     // arguments that this program recognizes
     static struct option options[] = {
@@ -57,11 +60,12 @@ int main(int argc, char *argv[]) {
     };
 
     // parse through arguments
-    while ((option = getopt_long(argc, argv, "p", options, NULL)) != -1) {
+    while ((option = getopt_long(argc, argv, "p:l:e", options, NULL)) != -1) {
         switch (option) {
             case 'p':
-                printf("received port option\n");
+		// set portFlag and portNumber
                 portFlag = 1;
+		portNumber = atoi(optarg);
                 break;
             case 'l':
                 printf("received log option\n");
@@ -84,10 +88,23 @@ int main(int argc, char *argv[]) {
     // set input mode to non-canonical no echo mode
     setInputMode();
 
+    // setup socket file descriptor
     socketFD = socket(AF_INET, SOCK_STREAM, 0);
-    if (socketFD < 0) { fprtinf(stderr, "error: error in opening socket\n"); exit(0); }
+    if (socketFD < 0) { fprintf(stderr, "error: error in opening socket\n"); exit(0); }
     server = gethostbyname("127.0.0.1");
     if (server == NULL) { fprintf(stderr, "error: cannot find host\n"); exit(0); }
 
+    // establish server address and assign it
+    memset((char*) &serverAddress, 0, sizeof(serverAddress));
+    serverAddress.sin_family = AF_INET;
+    memcpy((char*) &serverAddress.sin_addr.s_addr, (char*) server->h_addr, server->h_length);
+    serverAddress.sin_port = htons(portNumber);
+
+    if (connect(socketFD, (struct sockaddr *) &serverAddress, sizeof(serverAddress)) < 0) {
+	fprintf(stderr, "error: error in connecting\n");
+	exit(0);
+    }
+
     exit(0);
 }
+
