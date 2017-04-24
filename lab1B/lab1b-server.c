@@ -14,6 +14,7 @@
 #include<netinet/in.h>
 #include<sys/wait.h>
 #include<sys/types.h>
+#include<mcrypt.h>
 
 // buffer to hold read characters
 int BUFFER_SIZE = 1024;
@@ -162,7 +163,7 @@ void readWrite(int socketFD) {
         // if shell pollfd has POLLIN (has output to read)
         if ((pollfdArray[1].revents & POLLIN)) {
             int bytesRead = read(pipeToParent[0], &buffer, sizeof(char)); // read from shell pipe
-            if (encryptFlag) { encrypt(buffer, 1); } // encrypt data before sending over socket
+            if (encryptFlag) { encrypt(&buffer, 1); } // encrypt data before sending over socket
             write(socketFD, &buffer, sizeof(char));
         }
 
@@ -193,7 +194,7 @@ int main(int argc, char *argv[]) {
                 break;
             case 'e':
                 encryptFlag = 1;
-                char *key = getKey("key.txt");
+                char *key = getKey("my.key");
                 initializeEncryption(key, keyLength);
                 break;
             default:

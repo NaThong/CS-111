@@ -13,7 +13,8 @@ server:
 	gcc -g -lmcrypt lab1b-server.c -o lab1b-server
 
 clean:
-	rm -f *.tar.gz lab1b-client lab1b-server lab1b
+	rm -f *.tar.gz lab1b-client lab1b-server *.txt
 
 dist:
-	tar -czvf lab1b-004611638.tar.gz Makefile README
+	tar -czvf lab1b-004611638.tar.gz Makefile README my.key \
+	lab1b-client.c lab1b-server.c

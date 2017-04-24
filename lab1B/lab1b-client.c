@@ -163,9 +163,9 @@ void readWrite(socketFD) {
             	write(logFD, &buffer, sizeof(char));
 		write(logFD, "\n", 1);
 	    }
-            if (encryptFlag) { encrypt(&buffer, 1); }
+	    write(1, &buffer, sizeof(char)); // write to screen
+            if (encryptFlag) { encrypt(&buffer, 1); } // encrypt socket data
             write(socketFD, &buffer, sizeof(char)); // write to socket
-            write(1, &buffer, sizeof(char)); // write to screen
         }
 
         // if socket pollFD has POLLIN (has output to read)
@@ -224,7 +224,7 @@ int main(int argc, char *argv[]) {
                 break;
             case 'e':
                 encryptFlag = 1;
-                char *key = getKey("key.txt");
+                char *key = getKey("my.key");
 		        initializeEncryption(key, keyLength);
                 break;
             default:
