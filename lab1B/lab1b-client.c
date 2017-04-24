@@ -56,6 +56,10 @@ void readWrite(socketFD) {
 
     int returnValue;
     char buffer;
+    int logFD;
+    if (logFlag) {
+        logFD = creat(logFile);
+    }
 
     while (1) {
         // do a poll and check for errors
@@ -71,14 +75,18 @@ void readWrite(socketFD) {
             if (buffer == '\003') {
                 exit(0);
             }
-	    if (buffer == '\r' || buffer == '\n') {
+            if (buffer == '\r' || buffer == '\n') {
                 char tempBuffer[2] = {'\r','\n'};
+                write(logFD, "SENT 2 bytes: ", 14);
+                write(logFD, &tempBuffer, 2*sizeof(char));
                 write(1, &tempBuffer, 2*sizeof(char));
-		write(socketFD, &buffer, sizeof(char));
+                write(socketFD, &buffer, sizeof(char));
                 continue;
             }
             write(socketFD, &buffer, sizeof(char)); // write to socket
             write(1, &buffer, sizeof(char)); // write to screen
+            write(logFD, "RECEIVED 1 bytes: ", 14);
+            write(logFD, &buffer, sizeof(char));
         }
 
         // if socket pollFD has POLLIN (has output to read)
@@ -121,7 +129,7 @@ int main(int argc, char *argv[]) {
                 break;
             case 'l':
                	logFlag = 1;
-		logFile = optarg;
+		        logFile = optarg;
                 break;
             case 'e':
                 printf("received encrypt option\n");
