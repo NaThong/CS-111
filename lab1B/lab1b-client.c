@@ -16,11 +16,9 @@
 #include <netinet/in.h>
 #include <netdb.h>
 
-// struct to hold saved terminal attributes
-struct termios savedAttributes;
-
-int portFlag = 0; // flag for port option
-
+struct termios savedAttributes; // struct to hold saved terminal attributes
+int portFlag = 0; // flag for port flag
+int socketFD; // fd for socket
 
 void resetInputMode() {
     tcsetattr(STDIN_FILENO, TCSANOW, &savedAttributes);
