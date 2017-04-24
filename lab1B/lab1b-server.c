@@ -1,3 +1,7 @@
+// NAME: Jeffrey Chan
+// EMAIL: jeffschan97@gmail.com
+// ID: 004611638
+
 #include<stdio.h>
 #include<getopt.h>
 #include<stdlib.h>
