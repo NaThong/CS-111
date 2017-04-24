@@ -105,6 +105,11 @@ int main(int argc, char *argv[]) {
 	exit(0);
     }
 
+    char buffer;
+    while(read(0, &buffer, sizeof(char))) {
+	write(socketFD, &buffer, sizeof(char));
+    }
+
     exit(0);
 }
 

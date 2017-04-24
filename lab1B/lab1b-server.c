@@ -78,5 +78,10 @@ int main(int argc, char *argv[]) {
 	exit(1);
     }
 
+    char buffer;
+    while(read(newSocketFD, &buffer, sizeof(char))) {
+	write(1, &buffer, sizeof(char));
+    }
+
     exit(0);
 }
