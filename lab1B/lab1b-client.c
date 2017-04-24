@@ -10,11 +10,11 @@
 #include<poll.h>
 #include<sys/types.h>
 #include<sys/socket.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <string.h>
-#include <netinet/in.h>
-#include <netdb.h>
+#include<sys/stat.h>
+#include<fcntl.h>
+#include<string.h>
+#include<netinet/in.h>
+#include<netdb.h>
 
 struct termios savedAttributes; // struct to hold saved terminal attributes
 int portFlag = 0; // flag for port flag
