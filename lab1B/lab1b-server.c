@@ -39,6 +39,7 @@ void execShell() {
     close(pipeToParent[0]);
     dup2(pipeToChild[0], STDIN_FILENO);
     dup2(pipeToParent[1], STDOUT_FILENO);
+    dup2(pipeToParent[1], STDOUT_FILENO);
     close(pipeToChild[0]);
     close(pipeToParent[1]);
     
