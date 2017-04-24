@@ -58,7 +58,7 @@ void readWrite(socketFD) {
     char buffer;
     int logFD;
     if (logFlag) {
-        logFD = creat(logFile);
+        logFD = creat(logFile, 0666);
     }
 
     while (1) {
@@ -77,16 +77,21 @@ void readWrite(socketFD) {
             }
             if (buffer == '\r' || buffer == '\n') {
                 char tempBuffer[2] = {'\r','\n'};
-                write(logFD, "SENT 2 bytes: ", 14);
-                write(logFD, &tempBuffer, 2*sizeof(char));
+		if (logFlag) {
+                    write(logFD, "SENT 1 bytes: ", 14);
+                    write(logFD, &tempBuffer, 2*sizeof(char));
+		}
                 write(1, &tempBuffer, 2*sizeof(char));
                 write(socketFD, &buffer, sizeof(char));
                 continue;
             }
             write(socketFD, &buffer, sizeof(char)); // write to socket
             write(1, &buffer, sizeof(char)); // write to screen
-            write(logFD, "RECEIVED 1 bytes: ", 14);
-            write(logFD, &buffer, sizeof(char));
+            if (logFlag) {
+	    	write(logFD, "SENT 1 bytes: ", 14);
+            	write(logFD, &buffer, sizeof(char));
+		write(logFD, "\n", 1);
+	    }
         }
 
         // if socket pollFD has POLLIN (has output to read)
@@ -95,8 +100,18 @@ void readWrite(socketFD) {
             if (buffer == '\r' || buffer == '\n') {
                 char tempBuffer[2] = {'\r','\n'};
                 write(1, &tempBuffer, 2*sizeof(char));
+		if (logFlag) {
+		    write(logFD, "RECEIVED 1 bytes: ", 17);
+		    write(logFD, &tempBuffer, sizeof(char));
+		    write(logFD, "\n", sizeof(char));
+		}
                 continue;
             }
+	    if (logFlag) {
+		write(logFD, "RECEIVED 1 bytes: ", 17);
+		write(logFD, &buffer, sizeof(char));
+		write(logFD, "\n", 1);
+	    }
             write(1, &buffer, sizeof(char)); // write to client's output'
         }
 
@@ -129,7 +144,7 @@ int main(int argc, char *argv[]) {
                 break;
             case 'l':
                	logFlag = 1;
-		        logFile = optarg;
+		logFile = optarg;
                 break;
             case 'e':
                 printf("received encrypt option\n");

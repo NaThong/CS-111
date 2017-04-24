@@ -26,6 +26,12 @@ int pipeToParent[2];
 pid_t pid; // process id for when forking process
 int socketFD, newSocketFD;
 
+void signalHandler(int signal) {
+    if (signal == SIGINT) {
+	kill(pid, SIGINT);
+    }
+}
+
 void createPipe(int pipeHolder[2]) {
     if (pipe(pipeHolder) == -1) {
 	fprintf(stderr, "error: error in creating pipe");
@@ -39,7 +45,7 @@ void execShell() {
     close(pipeToParent[0]);
     dup2(pipeToChild[0], STDIN_FILENO);
     dup2(pipeToParent[1], STDOUT_FILENO);
-    dup2(pipeToParent[1], STDOUT_FILENO);
+    dup2(pipeToParent[1], STDERR_FILENO);
     close(pipeToChild[0]);
     close(pipeToParent[1]);
     
@@ -123,6 +129,9 @@ int main(int argc, char *argv[]) {
                 exit(1);
         }
     }
+
+    // process SIGINTS on the server side
+    signal(SIGINT, signalHandler);
 
     // setup socket settings
     socketFD = socket(AF_INET, SOCK_STREAM, 0);
