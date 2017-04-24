@@ -25,6 +25,73 @@ int pipeToParent[2];
 
 pid_t pid; // process id for when forking process
 int socketFD, newSocketFD;
+int encryptFlag; // flag for encrypt option
+int keyLength; // length of key
+MCRYPT cryptFD, decryptFD;
+
+void deinitializeEncryption() {
+    // DEINIT ENCRYPTIONG
+    mcrypt_generic_deinit(cryptFD);
+    mcrypt_module_close(cryptFD);
+    
+    // DEINIT DECRYPTIONG
+    mcrypt_generic_deinit(decryptFD);
+    mcrypt_module_close(decryptFD);
+}
+
+char* getKey(char *keyfile) {
+    struct stat keyStat;
+    int keyFD = open(keyfile, O_RDONLY);
+    if (fstat(keyFD, &keyStat) < 0) {
+        fprintf(stderr, "error: error with fstat\n");
+        exit(EXIT_FAILURE);
+    }
+    char *key = (char*)malloc(keyStat.st_size*sizeof(char));
+    if (read(keyFD, key, keyStat.st_size) < 0) {
+        fprintf(stderr, "error: error reading from key file\n");
+        exit(EXIT_FAILURE);
+    }
+    keyLength = keyStat.st_size;
+    return key;
+}
+
+void initializeEncryption(char *key, int keyLength) {
+    // INIT ENCRYPTION
+    cryptFD = mcrypt_module_open("blowfish", NULL, "cfb", NULL);
+    if (cryptFD == MCRYPT_FAILED) {
+	fprintf(stderr, "error: error in opening module\n");
+	exit(EXIT_FAILURE);
+    }
+    if (mcrypt_generic_init(cryptFD, key, keyLength, NULL) < 0) {
+	fprintf(stderr, "error: error in initializing encryption\n");
+	exit(EXIT_FAILURE);
+    }
+
+    // INIT DECRYPTION
+    decryptFD = mcrypt_module_open("blowfish", NULL, "cfb", NULL);
+    if (decryptFD == MCRYPT_FAILED) {
+	fprintf(stderr, "error: error in opening module\n");
+	exit(EXIT_FAILURE);
+    }
+    if (mcrypt_generic_init(decryptFD, key, keyLength, NULL) < 0) {
+	fprintf(stderr, "error: error in initializing decryption\n");
+	exit(EXIT_FAILURE);
+    }
+}
+
+void encrypt(char *buffer, int cryptLength) {
+	if(mcrypt_generic(cryptFD, buffer, cryptLength) != 0) {
+        fprintf(stderr, "error: error in with encrypting buffer\n");
+        exit(EXIT_FAILURE);
+    }
+}
+
+void decrypt(char *buffer, int decryptLength) {
+	if(mdecrypt_generic(decryptFD, buffer, decryptLength) != 0) {
+        fprintf(stderr, "error: error in decrypting buffer\n");
+        exit(EXIT_FAILURE);
+    }
+}
 
 void signalHandler(int signal) {
     if (signal == SIGINT) {
@@ -83,6 +150,7 @@ void readWrite(int socketFD) {
         // if socketFD pollfd revents has POLLIN (has input to read)
         if ((pollfdArray[0].revents & POLLIN)) {
             int bytesRead = read(socketFD, &buffer, sizeof(char)); // read from socketFD
+            if (encryptFlag) { decrypt(&buffer, 1); } // if encryptFlag, decrypt socket data
             if (buffer == '\r' || buffer == '\n') {
                 char shellBuffer[1] = {'\n'};
                 write(pipeToChild[1], &shellBuffer, sizeof(char));
@@ -94,10 +162,12 @@ void readWrite(int socketFD) {
         // if shell pollfd has POLLIN (has output to read)
         if ((pollfdArray[1].revents & POLLIN)) {
             int bytesRead = read(pipeToParent[0], &buffer, sizeof(char)); // read from shell pipe
+            if (encryptFlag) { encrypt(buffer, 1); } // encrypt data before sending over socket
             write(socketFD, &buffer, sizeof(char));
         }
 
         if ((pollfdArray[1].revents & (POLLHUP | POLLERR))) {
+            fprintf(stderr, "error: received POLLHUP|POLLERR\n");
             exit(0);    
         }
     }
@@ -122,7 +192,9 @@ int main(int argc, char *argv[]) {
                 portNumber = atoi(optarg);
                 break;
             case 'e':
-                printf("received encrypt option\n");
+                encryptFlag = 1;
+                char *key = getKey("key.txt");
+                initializeEncryption(key, keyLength);
                 break;
             default:
                 fprintf(stderr, "error: unrecognized argument\nrecognized arguments:\n--port\n--encryp\n");
