@@ -46,7 +46,39 @@ void setInputMode() {
 }
 
 void readWrite(socketFD) {
-    
+    struct pollfd pollfdArray[2]; // array of pollfd strctures
+    pollfdArray[0].fd = 0; // first pollfd describes keyboard
+    pollfdArray[1].fd = socketFD; // second pollfd describes socketFD
+    pollfdArray[0].events = POLLIN | POLLHUP | POLLERR;
+    pollfdArray[1].events = POLLIN | POLLHUP | POLLERR;
+
+    int returnValue;
+    char buffer;
+
+    while (1) {
+        // do a polli and check for errors
+        returnValue = poll(pollfdArray, 2, 0);
+        if (returnValue < 0) {
+            fprintf(stderr, "error: error while polling\n");
+            exit(1);
+        }
+        
+        // if keyboard pollfd revents has POLLIN (has input to read)
+        if ((pollfdArray[0].revents & POLLIN)) {
+            int bytesRead = read(fd1, &buffer, sizeof(char)); // read from keyboard
+            write(socketFD, &buffer, sizeof(char)); // write to socket
+        }
+
+        // if socket pollFD has POLLIN (has output to read)
+        if ((pollfdArray[1].revents & POLLIN)) {
+            int bytesRead = read(pipeToParent[0], &buffer, sizeof(char)); // read from socket
+            write(1, &buffer, sizeof(char)); // write to client's output'
+        }
+
+        if ((pollfdArray[1].revents & (POLLHUP | POLLERR))) {
+            exit(0);    
+        }
+    }
 }
 
 int main(int argc, char *argv[]) {
