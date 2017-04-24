@@ -15,6 +15,7 @@
 #include<string.h>
 #include<netinet/in.h>
 #include<netdb.h>
+#include<mcrypt.h>
 
 struct termios savedAttributes; // struct to hold saved terminal attributes
 int portFlag = 0; // flag for port flag
@@ -22,9 +23,24 @@ int logFlag = 0;
 int encryptFlag = 0;
 char *logFile = NULL;
 int socketFD; // fd for socket
+int keyLength; // lenght of key from key.txt
+MCRYPT cryptFD, decryptFD;
+
+void deinitializeEncryption() {
+    // DEINIT ENCRYPTIONG
+    mcrypt_generic_deinit(cryptFD);
+    mcrypt_module_close(cryptFD);
+    
+    // DEINIT DECRYPTIONG
+    mcrypt_generic_deinit(decryptFD);
+    mcrypt_module_close(decryptFD);
+}
 
 void resetInputMode() {
     tcsetattr(STDIN_FILENO, TCSANOW, &savedAttributes);
+    if (encryptFlag) {
+	deinitializeEncryption();
+    }
 }
 
 void setInputMode() {
@@ -46,6 +62,46 @@ void setInputMode() {
     terminalAttributes.c_oflag=0;
     terminalAttributes.c_lflag=0;
     tcsetattr(STDIN_FILENO, TCSANOW, &terminalAttributes);
+}
+
+char* getKey(char *keyfile) {
+    struct stat keyStat;
+    int keyFD = open(keyfile, O_RDONLY);
+    if (fstat(keyFD, &keyStat) < 0) {
+	fprintf(stderr, "error: error with fstat\n");
+	exit(EXIT_FAILURE);
+    }
+    char *key = (char*)malloc(keyStat.st_size*sizeof(char));
+    if (read(keyFD, key, keyStat.st_size) < 0) {
+	fprintf(stderr, "error: error reading from key file\n");
+	exit(EXIT_FAILURE);
+    }
+    keyLength = keyStat.st_size;
+    return key;
+}
+
+void initializeEncryption(char *key, int keyLength) {
+    // INIT ENCRYPTION
+    cryptFD = mcrypt_module_open("blowfish", NULL, "cfb", NULL);
+    if (cryptFD == MCRYPT_FAILED) {
+	fprintf(stderr, "error: error in opening module\n");
+	exit(EXIT_FAILURE);
+    }
+    if (mcrypt_generic_init(cryptFD, key, keyLength, NULL) < 0) {
+	fprintf(stderr, "error: error in initializing encryption\n");
+	exit(EXIT_FAILURE);
+    }
+
+    // INIT DECRYPTION
+    decryptFD = mcrypt_module_open("blowfish", NULL, "cfb", NULL);
+    if (decryptFD == MCRYPT_FAILED) {
+	fprintf(stderr, "error: error in opening module\n");
+	exit(EXIT_FAILURE);
+    }
+    if (mcrypt_generic_init(decryptFD, key, keyLength, NULL) < 0) {
+	fprintf(stderr, "error: error in initializing decryption\n");
+	exit(EXIT_FAILURE);
+    }
 }
 
 void readWrite(socketFD) {
@@ -117,6 +173,7 @@ void readWrite(socketFD) {
         }
 
         if ((pollfdArray[1].revents & (POLLHUP | POLLERR))) {
+	    fprintf(stderr, "error: received POLLHUP | POLLERR");
             exit(0);    
         }
     }
@@ -149,7 +206,8 @@ int main(int argc, char *argv[]) {
                 break;
             case 'e':
                 encryptFlag = 1;
-                char *key = grab_key("key.txt");
+                char *key = getKey("key.txt");
+		initializeEncryption(key, keyLength);
                 break;
             default:
                 fprintf(stderr, "error: unrecognized argument\nrecognized arguments:\n--port\n--log\n--encrypt\n");
