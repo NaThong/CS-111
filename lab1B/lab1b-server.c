@@ -26,6 +26,42 @@ int pipeToParent[2];
 pid_t pid; // process id for when forking process
 int socketFD, newSocketFD;
 
+void createPipe(int pipeHolder[2]) {
+    if (pipe(pipeHolder) == -1) {
+	fprintf(stderr, "error: error in creating pipe");
+	exit(1);
+    }
+}
+
+void execShell() {
+    // pipe reconnection
+    close(pipeToChild[1]);
+    close(pipeToParent[0]);
+    dup2(pipeToChild[0], STDIN_FILENO);
+    dup2(pipeToParent[1], STDOUT_FILENO);
+    close(pipeToChild[0]);
+    close(pipeToParent[1]);
+    
+    // format arguments for shell
+    char *execvp_argv[2];
+    char execvp_filename[] = "/bin/bash";
+    execvp_argv[0] = execvp_filename;
+    execvp_argv[1] = NULL;
+
+    // execute shell with it's filename as an argument
+    if (execvp(execvp_filename, execvp_argv) == -1) {
+        fprintf(stderr, "error: error in executing shell");
+        exit(1);
+    }
+}
+
+void readWrite(int socketFD) {
+    char buffer;
+    while (read(socketFD, &buffer, sizeof(char))) {
+        write(socketFD, &buffer, sizeof(char));
+    }
+}
+
 int main(int argc, char *argv[]) {
      int option = 0; // used to hold option
      int portNumber, clientLength;
@@ -78,9 +114,23 @@ int main(int argc, char *argv[]) {
 	exit(1);
     }
 
-    char buffer;
-    while(read(newSocketFD, &buffer, sizeof(char))) {
-	write(1, &buffer, sizeof(char));
+    // create pipes
+    createPipe(pipeToChild);
+    createPipe(pipeToParent);
+
+    // fork process and exec shell
+    pid = fork();
+    if (pid < 0) {
+        fprintf(stderr, "error: error in forking\n");
+        exit(1);
+    }
+    else if (pid == 0) {
+        // CHILD PROCESS
+        execShell();
+    }
+    else {
+        // PARENT PROCESS
+        readWrite(newSocketFD);
     }
 
     exit(0);

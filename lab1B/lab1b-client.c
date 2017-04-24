@@ -45,6 +45,10 @@ void setInputMode() {
     tcsetattr(STDIN_FILENO, TCSANOW, &terminalAttributes);
 }
 
+void readWrite(socketFD) {
+    
+}
+
 int main(int argc, char *argv[]) {
     int option = 0; // used to hold option
     struct hostent *server;
@@ -105,10 +109,7 @@ int main(int argc, char *argv[]) {
 	exit(0);
     }
 
-    char buffer;
-    while(read(0, &buffer, sizeof(char))) {
-	write(socketFD, &buffer, sizeof(char));
-    }
+    readWrite(socketFD);
 
     exit(0);
 }

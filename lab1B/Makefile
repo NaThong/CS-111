@@ -5,7 +5,6 @@
 .SILENT:
 
 default: client server
-	gcc -g lab1b.c -o lab1b \
     
 client:
 	gcc -g lab1b-client.c -o lab1b-client
