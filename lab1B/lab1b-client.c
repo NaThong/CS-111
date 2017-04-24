@@ -17,13 +17,15 @@
 #include<netdb.h>
 #include<mcrypt.h>
 
-struct termios savedAttributes; // struct to hold saved terminal attributes
-int portFlag = 0; // flag for port flag
+// FLAGS
+int portFlag = 0
 int logFlag = 0;
 int encryptFlag = 0;
-char *logFile = NULL;
-int socketFD; // fd for socket
-int keyLength; // lenght of key from key.txt
+
+struct termios savedAttributes; // struct to hold saved terminal attributes
+char *logFile = NULL;           // string to hold log file
+int socketFD;                   // fd for socket
+int keyLength;                  // length of key from my.key
 MCRYPT cryptFD, decryptFD;
 
 void deinitializeEncryption() {
@@ -65,6 +67,7 @@ void setInputMode() {
 }
 
 char* getKey(char *keyfile) {
+    // Gets key from keyfile
     struct stat keyStat;
     int keyFD = open(keyfile, O_RDONLY);
     if (fstat(keyFD, &keyStat) < 0) {
@@ -105,6 +108,7 @@ void initializeEncryption(char *key, int keyLength) {
 }
 
 void encrypt(char *buffer, int cryptLength) {
+    // encrypts a buffer with size cryptLength
 	if(mcrypt_generic(cryptFD, buffer, cryptLength) != 0) {
         fprintf(stderr, "error: error in with encrypting buffer\n");
         exit(EXIT_FAILURE);
@@ -112,6 +116,7 @@ void encrypt(char *buffer, int cryptLength) {
 }
 
 void decrypt(char *buffer, int decryptLength) {
+    // decrypts a buffer with size decryptLenght
 	if(mdecrypt_generic(decryptFD, buffer, decryptLength) != 0) {
         fprintf(stderr, "error: error in decrypting buffer\n");
         exit(EXIT_FAILURE);
@@ -119,9 +124,9 @@ void decrypt(char *buffer, int decryptLength) {
 }
 
 void readWrite(socketFD) {
-    struct pollfd pollfdArray[2]; // array of pollfd strctures
-    pollfdArray[0].fd = 0; // first pollfd describes keyboard
-    pollfdArray[1].fd = socketFD; // second pollfd describes socketFD
+    struct pollfd pollfdArray[2];       // array of pollfd strctures
+    pollfdArray[0].fd = 0;              // first pollfd describes keyboard
+    pollfdArray[1].fd = socketFD;       // second pollfd describes socketFD
     pollfdArray[0].events = POLLIN | POLLHUP | POLLERR;
     pollfdArray[1].events = POLLIN | POLLHUP | POLLERR;
 
