@@ -42,8 +42,7 @@ int main(int argc, char *argv[]) {
     while ((option = getopt_long(argc, argv, "p:e", options, NULL)) != -1) {
         switch (option) {
             case 'p':
-                printf("received port option\n");
-                porNumber = atoi(optarg);
+                portNumber = atoi(optarg);
                 break;
             case 'e':
                 printf("received encrypt option\n");
@@ -70,4 +69,14 @@ int main(int argc, char *argv[]) {
 
     // listen for incoming clients
     listen(socketFD, 5);
+    clientLength = sizeof(clientAddress);
+
+    // accept connection from client
+    newSocketFD = accept(socketFD, (struct sockaddr *) &clientAddress, &clientLength);
+    if (newSocketFD < 0) {
+	fprintf(stderr, "error: error accepting client");
+	exit(1);
+    }
+
+    exit(0);
 }
