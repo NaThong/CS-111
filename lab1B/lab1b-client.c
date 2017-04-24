@@ -19,6 +19,7 @@
 struct termios savedAttributes; // struct to hold saved terminal attributes
 int portFlag = 0; // flag for port flag
 int logFlag = 0;
+int encryptFlag = 0;
 char *logFile = NULL;
 int socketFD; // fd for socket
 
@@ -147,7 +148,8 @@ int main(int argc, char *argv[]) {
 		logFile = optarg;
                 break;
             case 'e':
-                printf("received encrypt option\n");
+                encryptFlag = 1;
+                char *key = grab_key("key.txt");
                 break;
             default:
                 fprintf(stderr, "error: unrecognized argument\nrecognized arguments:\n--port\n--log\n--encrypt\n");
