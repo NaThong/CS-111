@@ -39,7 +39,7 @@ void deinitializeEncryption() {
 void resetInputMode() {
     tcsetattr(STDIN_FILENO, TCSANOW, &savedAttributes);
     if (encryptFlag) {
-	deinitializeEncryption();
+	    deinitializeEncryption();
     }
 }
 
@@ -68,13 +68,13 @@ char* getKey(char *keyfile) {
     struct stat keyStat;
     int keyFD = open(keyfile, O_RDONLY);
     if (fstat(keyFD, &keyStat) < 0) {
-	fprintf(stderr, "error: error with fstat\n");
-	exit(EXIT_FAILURE);
+        fprintf(stderr, "error: error with fstat\n");
+        exit(EXIT_FAILURE);
     }
     char *key = (char*)malloc(keyStat.st_size*sizeof(char));
     if (read(keyFD, key, keyStat.st_size) < 0) {
-	fprintf(stderr, "error: error reading from key file\n");
-	exit(EXIT_FAILURE);
+        fprintf(stderr, "error: error reading from key file\n");
+        exit(EXIT_FAILURE);
     }
     keyLength = keyStat.st_size;
     return key;
@@ -104,6 +104,20 @@ void initializeEncryption(char *key, int keyLength) {
     }
 }
 
+void encrypt(char *buffer, int cryptLength) {
+	if(mcrypt_generic(cryptFD, buffer, cryptLength) != 0) {
+        frprintf(stderr, "error: error in with encrypting buffer\n");
+        exit(EXIT_FAILURE);
+    }
+}
+
+void decrypt(char *buffer, int decryptLength) {
+	if(mdecrypt_generic(decryptFD, buffer, decryptLength) != 0) {
+        fprintf(stderr, "error: error in decrypting buffer\n");
+        exit(EXIT_FAILURE);
+    }
+}
+
 void readWrite(socketFD) {
     struct pollfd pollfdArray[2]; // array of pollfd strctures
     pollfdArray[0].fd = 0; // first pollfd describes keyboard
@@ -130,62 +144,66 @@ void readWrite(socketFD) {
         if ((pollfdArray[0].revents & POLLIN)) {
             int bytesRead = read(0, &buffer, sizeof(char)); // read from keyboard
             if (buffer == '\003') {
+                // TODO: something here that ends program and closes socket
                 exit(0);
             }
             if (buffer == '\r' || buffer == '\n') {
                 char tempBuffer[2] = {'\r','\n'};
-		if (logFlag) {
+		        if (logFlag) {
                     write(logFD, "SENT 1 bytes: ", 14);
                     write(logFD, &tempBuffer, 2*sizeof(char));
-		}
+		        }
                 write(1, &tempBuffer, 2*sizeof(char));
+                if (encryptFlag) { encrypt(&buffer, 1) }
                 write(socketFD, &buffer, sizeof(char));
                 continue;
             }
+            if (logFlag) {
+	    	    write(logFD, "SENT 1 bytes: ", 14);
+            	write(logFD, &buffer, sizeof(char));
+		        write(logFD, "\n", 1);
+	        }
+            if (encryptFlag) { encrypt(buffer, 1); }
             write(socketFD, &buffer, sizeof(char)); // write to socket
             write(1, &buffer, sizeof(char)); // write to screen
-            if (logFlag) {
-	    	write(logFD, "SENT 1 bytes: ", 14);
-            	write(logFD, &buffer, sizeof(char));
-		write(logFD, "\n", 1);
-	    }
         }
 
         // if socket pollFD has POLLIN (has output to read)
         if ((pollfdArray[1].revents & POLLIN)) {
             int bytesRead = read(socketFD, &buffer, sizeof(char)); // read from socket
+            if (encryptFlag) { decrypt(buffer, 1); }
             if (buffer == '\r' || buffer == '\n') {
                 char tempBuffer[2] = {'\r','\n'};
                 write(1, &tempBuffer, 2*sizeof(char));
-		if (logFlag) {
-		    write(logFD, "RECEIVED 1 bytes: ", 17);
-		    write(logFD, &tempBuffer, sizeof(char));
-		    write(logFD, "\n", sizeof(char));
-		}
+                if (logFlag) {
+                    write(logFD, "RECEIVED 1 bytes: ", 17);
+                    write(logFD, &tempBuffer, sizeof(char));
+                    write(logFD, "\n", sizeof(char));
+                }
                 continue;
             }
-	    if (logFlag) {
-		write(logFD, "RECEIVED 1 bytes: ", 17);
-		write(logFD, &buffer, sizeof(char));
-		write(logFD, "\n", 1);
-	    }
-            write(1, &buffer, sizeof(char)); // write to client's output'
+            if (logFlag) {
+                write(logFD, "RECEIVED 1 bytes: ", 17);
+                write(logFD, &buffer, sizeof(char));
+                write(logFD, "\n", 1);
+            }
+            write(1, &buffer, sizeof(char)); // write to screen
         }
 
+        // error checking from socket pollFD
         if ((pollfdArray[1].revents & (POLLHUP | POLLERR))) {
-	    fprintf(stderr, "error: received POLLHUP | POLLERR");
+	        fprintf(stderr, "error: received POLLHUP | POLLERR");
             exit(0);    
         }
     }
 }
 
 int main(int argc, char *argv[]) {
-    int option = 0; // used to hold option
+    int option = 0;
     struct hostent *server;
     struct sockaddr_in serverAddress;
     int portNumber;
 
-    // arguments that this program recognizes
     static struct option options[] = {
     	{"port", required_argument, 0, 'p'},
         {"log", required_argument, 0, 'l'},
@@ -198,16 +216,16 @@ int main(int argc, char *argv[]) {
         switch (option) {
             case 'p':
                 portFlag = 1;
-		portNumber = atoi(optarg);
+		        portNumber = atoi(optarg);
                 break;
             case 'l':
                	logFlag = 1;
-		logFile = optarg;
+		        logFile = optarg;
                 break;
             case 'e':
                 encryptFlag = 1;
                 char *key = getKey("key.txt");
-		initializeEncryption(key, keyLength);
+		        initializeEncryption(key, keyLength);
                 break;
             default:
                 fprintf(stderr, "error: unrecognized argument\nrecognized arguments:\n--port\n--log\n--encrypt\n");
@@ -237,8 +255,8 @@ int main(int argc, char *argv[]) {
     serverAddress.sin_port = htons(portNumber);
 
     if (connect(socketFD, (struct sockaddr *) &serverAddress, sizeof(serverAddress)) < 0) {
-	fprintf(stderr, "error: error in connecting\n");
-	exit(0);
+        fprintf(stderr, "error: error in connecting\n");
+        exit(0);
     }
 
     readWrite(socketFD);
