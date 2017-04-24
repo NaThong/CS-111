@@ -13,8 +13,8 @@ int main(int argc, char *argv[]) {
     // arguments that this program recognizes
     static struct option options[] = {
     	{"port", required_argument, 0, 'p'},
-	{"log", required_argument, 0, 'l'},
-	{"encrypt", required_argument, 0, 'e'},
+        {"log", required_argument, 0, 'l'},
+        {"encrypt", required_argument, 0, 'e'},
         {0, 0, 0, 0}
     };
 
@@ -23,15 +23,19 @@ int main(int argc, char *argv[]) {
             case 'p':
                 printf("received port option\n");
                 break;
-	    case 'l':
-		printf("received log option\n");
-		break;
-	    case 'e':
-		printf("received encrypt option\n");
-		break;
+            case 'l':
+                printf("received log option\n");
+                break;
+            case 'e':
+                printf("received encrypt option\n");
+                break;
             default:
                 fprintf(stderr, "error: unrecognized argument\nrecognized arguments:\n--port\n--log\n--encrypt\n");
                 exit(1);
         }
+    }
+    char buffer;
+    while(read(0, &buffer, sizeof(char))) {
+        write(1, &buffer, sizeof(char));
     }
 }
