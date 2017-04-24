@@ -77,9 +77,7 @@ void readWrite(int socketFD) {
         if ((pollfdArray[0].revents & POLLIN)) {
             int bytesRead = read(socketFD, &buffer, sizeof(char)); // read from socketFD
             if (buffer == '\r' || buffer == '\n') {
-                char tempBuffer[2] = {'\r', '\n'};
                 char shellBuffer[1] = {'\n'};
-                write(fd2, &tempBuffer, 2*sizeof(char));
                 write(pipeToChild[1], &shellBuffer, sizeof(char));
                 continue;
             }
