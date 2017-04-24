@@ -76,6 +76,11 @@ void readWrite(socketFD) {
         // if socket pollFD has POLLIN (has output to read)
         if ((pollfdArray[1].revents & POLLIN)) {
             int bytesRead = read(socketFD, &buffer, sizeof(char)); // read from socket
+            if (buffer == '\r' || buffer == '\n') {
+                char tempBuffer[2] = {'\r','\n'};
+                write(pipeToChild[1], &tempBuffer, 2*sizeof(char));
+                continue;
+            }
             write(1, &buffer, sizeof(char)); // write to client's output'
         }
 
