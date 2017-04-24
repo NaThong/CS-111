@@ -65,13 +65,13 @@ void readWrite(socketFD) {
         
         // if keyboard pollfd revents has POLLIN (has input to read)
         if ((pollfdArray[0].revents & POLLIN)) {
-            int bytesRead = read(fd1, &buffer, sizeof(char)); // read from keyboard
+            int bytesRead = read(0, &buffer, sizeof(char)); // read from keyboard
             write(socketFD, &buffer, sizeof(char)); // write to socket
         }
 
         // if socket pollFD has POLLIN (has output to read)
         if ((pollfdArray[1].revents & POLLIN)) {
-            int bytesRead = read(pipeToParent[0], &buffer, sizeof(char)); // read from socket
+            int bytesRead = read(socketFD, &buffer, sizeof(char)); // read from socket
             write(1, &buffer, sizeof(char)); // write to client's output'
         }
 
