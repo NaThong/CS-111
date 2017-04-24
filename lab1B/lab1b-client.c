@@ -18,6 +18,8 @@
 
 struct termios savedAttributes; // struct to hold saved terminal attributes
 int portFlag = 0; // flag for port flag
+int logFlag = 0;
+char *logFile = NULL;
 int socketFD; // fd for socket
 
 void resetInputMode() {
@@ -69,6 +71,12 @@ void readWrite(socketFD) {
             if (buffer == '\003') {
                 exit(0);
             }
+	    if (buffer == '\r' || buffer == '\n') {
+                char tempBuffer[2] = {'\r','\n'};
+                write(1, &tempBuffer, 2*sizeof(char));
+		write(socketFD, &buffer, sizeof(char));
+                continue;
+            }
             write(socketFD, &buffer, sizeof(char)); // write to socket
             write(1, &buffer, sizeof(char)); // write to screen
         }
@@ -78,7 +86,7 @@ void readWrite(socketFD) {
             int bytesRead = read(socketFD, &buffer, sizeof(char)); // read from socket
             if (buffer == '\r' || buffer == '\n') {
                 char tempBuffer[2] = {'\r','\n'};
-                write(pipeToChild[1], &tempBuffer, 2*sizeof(char));
+                write(1, &tempBuffer, 2*sizeof(char));
                 continue;
             }
             write(1, &buffer, sizeof(char)); // write to client's output'
@@ -108,12 +116,12 @@ int main(int argc, char *argv[]) {
     while ((option = getopt_long(argc, argv, "p:l:e", options, NULL)) != -1) {
         switch (option) {
             case 'p':
-		// set portFlag and portNumber
                 portFlag = 1;
 		portNumber = atoi(optarg);
                 break;
             case 'l':
-                printf("received log option\n");
+               	logFlag = 1;
+		logFile = optarg;
                 break;
             case 'e':
                 printf("received encrypt option\n");
