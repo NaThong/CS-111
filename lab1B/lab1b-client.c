@@ -106,7 +106,7 @@ void initializeEncryption(char *key, int keyLength) {
 
 void encrypt(char *buffer, int cryptLength) {
 	if(mcrypt_generic(cryptFD, buffer, cryptLength) != 0) {
-        frprintf(stderr, "error: error in with encrypting buffer\n");
+        fprintf(stderr, "error: error in with encrypting buffer\n");
         exit(EXIT_FAILURE);
     }
 }
@@ -149,21 +149,21 @@ void readWrite(socketFD) {
             }
             if (buffer == '\r' || buffer == '\n') {
                 char tempBuffer[2] = {'\r','\n'};
-		        if (logFlag) {
+		if (logFlag) {
                     write(logFD, "SENT 1 bytes: ", 14);
                     write(logFD, &tempBuffer, 2*sizeof(char));
-		        }
+		}
                 write(1, &tempBuffer, 2*sizeof(char));
-                if (encryptFlag) { encrypt(&buffer, 1) }
+                if (encryptFlag) { encrypt(&buffer, 1); }
                 write(socketFD, &buffer, sizeof(char));
                 continue;
             }
             if (logFlag) {
-	    	    write(logFD, "SENT 1 bytes: ", 14);
+	    	write(logFD, "SENT 1 bytes: ", 14);
             	write(logFD, &buffer, sizeof(char));
-		        write(logFD, "\n", 1);
-	        }
-            if (encryptFlag) { encrypt(buffer, 1); }
+		write(logFD, "\n", 1);
+	    }
+            if (encryptFlag) { encrypt(&buffer, 1); }
             write(socketFD, &buffer, sizeof(char)); // write to socket
             write(1, &buffer, sizeof(char)); // write to screen
         }
@@ -171,7 +171,7 @@ void readWrite(socketFD) {
         // if socket pollFD has POLLIN (has output to read)
         if ((pollfdArray[1].revents & POLLIN)) {
             int bytesRead = read(socketFD, &buffer, sizeof(char)); // read from socket
-            if (encryptFlag) { decrypt(buffer, 1); }
+            if (encryptFlag) { decrypt(&buffer, 1); }
             if (buffer == '\r' || buffer == '\n') {
                 char tempBuffer[2] = {'\r','\n'};
                 write(1, &tempBuffer, 2*sizeof(char));
