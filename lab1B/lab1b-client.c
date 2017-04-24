@@ -66,6 +66,9 @@ void readWrite(socketFD) {
         // if keyboard pollfd revents has POLLIN (has input to read)
         if ((pollfdArray[0].revents & POLLIN)) {
             int bytesRead = read(0, &buffer, sizeof(char)); // read from keyboard
+	    if (buffer == '\003') {
+		exit(0);
+	    }
             write(socketFD, &buffer, sizeof(char)); // write to socket
         }
 
