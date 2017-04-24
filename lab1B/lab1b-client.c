@@ -34,19 +34,10 @@ void setInputMode() {
 
     // set terminal mode
     tcgetattr(STDIN_FILENO, &terminalAttributes);
-    tattr.c_iflag=ISTRIP;
-    tattr.c_oflag=0;
-    tattr.c_lflag=0;
-    tcsetattr (STDIN_FILENO, TCSANOW, &tattr);
-    /*
-    terminalAttributes.c_lflag &= ~(ICANON|ECHO); // clear ICANON and ECHO
-    terminalAttributes.c_cc[VMIN] = 1;
-    terminalAttributes.c_cc[VTIME] = 0;
-    if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &terminalAttributes) < 0) {
-        fprintf(stderr, "error: error in setting new termianl attributes");
-        exit(EXIT_FAILURE);
-    */
-    }
+    terminalAttributes.c_iflag=ISTRIP;
+    terminalAttributes.c_oflag=0;
+    terminalAttributes.c_lflag=0;
+    tcsetattr(STDIN_FILENO, TCSANOW, &terminalAttributes);
 }
 
 int main(int argc, char *argv[]) {
@@ -89,6 +80,10 @@ int main(int argc, char *argv[]) {
 
     char buffer;
     while(read(0, &buffer, sizeof(char))) {
+	if (buffer == '\003') {
+	    write(1, "^C\n", 4);
+	    exit(0);
+	}
         write(1, &buffer, sizeof(char));
     }
 }
