@@ -34,12 +34,18 @@ void setInputMode() {
 
     // set terminal mode
     tcgetattr(STDIN_FILENO, &terminalAttributes);
+    tattr.c_iflag=ISTRIP;
+    tattr.c_oflag=0;
+    tattr.c_lflag=0;
+    tcsetattr (STDIN_FILENO, TCSANOW, &tattr);
+    /*
     terminalAttributes.c_lflag &= ~(ICANON|ECHO); // clear ICANON and ECHO
     terminalAttributes.c_cc[VMIN] = 1;
     terminalAttributes.c_cc[VTIME] = 0;
     if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &terminalAttributes) < 0) {
         fprintf(stderr, "error: error in setting new termianl attributes");
         exit(EXIT_FAILURE);
+    */
     }
 }
 
