@@ -8,6 +8,13 @@
 #include<unistd.h>
 #include<termios.h>
 #include<poll.h>
+#include<sys/types.h>
+#include<sys/socket.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <string.h>
+#include <netinet/in.h>
+#include <netdb.h>
 
 // struct to hold saved terminal attributes
 struct termios savedAttributes;
@@ -76,14 +83,13 @@ int main(int argc, char *argv[]) {
         exit(1);
     }
 
+    // set input mode to non-canonical no echo mode
     setInputMode();
 
-    char buffer;
-    while(read(0, &buffer, sizeof(char))) {
-	if (buffer == '\003') {
-	    write(1, "^C\n", 4);
-	    exit(0);
-	}
-        write(1, &buffer, sizeof(char));
-    }
+    socketFD = socket(AF_INET, SOCK_STREAM, 0);
+    if (socketFD < 0) { fprtinf(stderr, "error: error in opening socket\n"); exit(0); }
+    server = gethostbyname("127.0.0.1");
+    if (server == NULL) { fprintf(stderr, "error: cannot find host\n"); exit(0); }
+
+    exit(0);
 }
