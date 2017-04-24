@@ -56,7 +56,7 @@ void readWrite(socketFD) {
     char buffer;
 
     while (1) {
-        // do a polli and check for errors
+        // do a poll and check for errors
         returnValue = poll(pollfdArray, 2, 0);
         if (returnValue < 0) {
             fprintf(stderr, "error: error while polling\n");
@@ -66,10 +66,11 @@ void readWrite(socketFD) {
         // if keyboard pollfd revents has POLLIN (has input to read)
         if ((pollfdArray[0].revents & POLLIN)) {
             int bytesRead = read(0, &buffer, sizeof(char)); // read from keyboard
-	    if (buffer == '\003') {
-		exit(0);
-	    }
+            if (buffer == '\003') {
+                exit(0);
+            }
             write(socketFD, &buffer, sizeof(char)); // write to socket
+            write(1, &buffer, sizeof(char)); // write to screen
         }
 
         // if socket pollFD has POLLIN (has output to read)
