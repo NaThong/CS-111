@@ -18,7 +18,7 @@
 #include<mcrypt.h>
 
 // FLAGS
-int portFlag = 0
+int portFlag = 0;
 int logFlag = 0;
 int encryptFlag = 0;
 
@@ -153,44 +153,40 @@ void readWrite(socketFD) {
                 exit(0);
             }
             if (buffer == '\r' || buffer == '\n') {
-                char tempBuffer[2] = {'\r','\n'};
-		if (logFlag) {
-                    write(logFD, "SENT 1 bytes: ", 14);
-                    write(logFD, &tempBuffer, 2*sizeof(char));
-		}
+                char tempBuffer[2] = {'\r','\n'};	
                 write(1, &tempBuffer, 2*sizeof(char));
                 if (encryptFlag) { encrypt(&buffer, 1); }
+		if (logFlag) {
+		    write(logFD, "SENT 1 bytes: ", 14);
+		    write(logFD, &buffer, sizeof(char));
+		    write(logFD, "\n", sizeof(char));
+		}
                 write(socketFD, &buffer, sizeof(char));
                 continue;
             }
-            if (logFlag) {
-	    	write(logFD, "SENT 1 bytes: ", 14);
-            	write(logFD, &buffer, sizeof(char));
-		write(logFD, "\n", 1);
-	    }
 	    write(1, &buffer, sizeof(char)); // write to screen
             if (encryptFlag) { encrypt(&buffer, 1); } // encrypt socket data
+	    if (logFlag) {
+                write(logFD, "SENT 1 bytes: ", 14);
+                write(logFD, &buffer, sizeof(char));
+                write(logFD, "\n", 1);
+            }
             write(socketFD, &buffer, sizeof(char)); // write to socket
         }
 
         // if socket pollFD has POLLIN (has output to read)
         if ((pollfdArray[1].revents & POLLIN)) {
             int bytesRead = read(socketFD, &buffer, sizeof(char)); // read from socket
+	    if (logFlag) {
+		write(logFD, "RECEIVED 1 bytes: ", 17);
+		write(logFD, &buffer, sizeof(char));
+		write(logFD, "\n", 1);
+	    }
             if (encryptFlag) { decrypt(&buffer, 1); }
             if (buffer == '\r' || buffer == '\n') {
                 char tempBuffer[2] = {'\r','\n'};
                 write(1, &tempBuffer, 2*sizeof(char));
-                if (logFlag) {
-                    write(logFD, "RECEIVED 1 bytes: ", 17);
-                    write(logFD, &tempBuffer, sizeof(char));
-                    write(logFD, "\n", sizeof(char));
-                }
                 continue;
-            }
-            if (logFlag) {
-                write(logFD, "RECEIVED 1 bytes: ", 17);
-                write(logFD, &buffer, sizeof(char));
-                write(logFD, "\n", 1);
             }
             write(1, &buffer, sizeof(char)); // write to screen
         }
