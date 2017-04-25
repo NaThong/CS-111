@@ -148,10 +148,10 @@ void readWrite(socketFD) {
         // if keyboard pollfd revents has POLLIN (has input to read)
         if ((pollfdArray[0].revents & POLLIN)) {
             int bytesRead = read(0, &buffer, sizeof(char)); // read from keyboard
-            if (buffer == '\003') {
+            /*if (buffer == '\003') {
                 // TODO: something here that ends program and closes socket
                 exit(0);
-            }
+            }*/
             if (buffer == '\r' || buffer == '\n') {
                 char tempBuffer[2] = {'\r','\n'};	
                 write(1, &tempBuffer, 2*sizeof(char));
