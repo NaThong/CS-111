@@ -3,3 +3,24 @@ EMAIL: jeffschan97@gmail.com
 ID: 004-611-638
 
 Included Files:
+
+lab1b-client.c - C source code that compiles into the client side of the
+project. Supports all three options include --log, --port, and --encrypt.
+
+lab1b-server.c -C source code that compiles into the server side of the
+project. Supports both options including --encrypt and --port.
+
+my.key - file that contains the key used in encrypted communication between
+the client and the server.
+
+Makefile - Makefile that supports a default target to build both the client
+executable and the server executable. It supports separate client and server
+targets. It also contains the traditional clean and dist targets.
+
+Resources:
+
+Tutorial on how network communication through a socket:
+https://www.tutorialspoint.com/unix_sockets/socket_client_example.htm
+
+Resource that helped me understand the mcrypt encryption library:
+http://mcrypt.hellug.gr/lib/mcrypt.3.html

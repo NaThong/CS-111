@@ -148,12 +148,6 @@ void readWrite(socketFD) {
         // if keyboard pollfd revents has POLLIN (has input to read)
         if ((pollfdArray[0].revents & POLLIN)) {
             int bytesRead = read(0, &buffer, sizeof(char)); // read from keyboard
-            /f (buffer == '\003') {
-            // TODO: something here that ends program and closes socket
-            // TODO: client should not check for ^C or ^D but should send it to server instead
-            if (buffer == '\003') {
-                exit(0);
-            }
             if (buffer == '\r' || buffer == '\n') {
                 char tempBuffer[2] = {'\r','\n'};	
                 write(1, &tempBuffer, 2*sizeof(char));
@@ -190,13 +184,15 @@ void readWrite(socketFD) {
                 write(1, &tempBuffer, 2*sizeof(char));
                 continue;
             }
+	    /*if (buffer == '\004') {
+		exit(0);
+	    }*/
             write(1, &buffer, sizeof(char));                        // write to screen
         }
 
         // error checking from socket pollFD
         if ((pollfdArray[1].revents & (POLLHUP | POLLERR))) {
-	        fprintf(stderr, "error: received POLLHUP | POLLERR");
-            exit(0);    
+	    exit(0);    
         }
     }
 }
