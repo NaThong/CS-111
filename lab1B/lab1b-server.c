@@ -139,6 +139,17 @@ void closeAllFD() {
 
 void shutdownServer() {
     closeAllFD();
+    int status;
+    if (waitpid(pid, &status, 0) == -1) {
+        fprintf(stderr, "error: waitpid failed");
+        exit(EXIT_FAILURE);
+    }
+    if (WIFEXITED(status)) {
+        const int es = WEXITSTATUS(status);
+        const int ss = WTERMSIG(status);
+        fprintf(stderr, "SHELL EXIT SIGNAL=%d STATUS=%d\n", ss, es);
+        exit(0);
+    }
 }
 
 void readWrite(int socketFD) {
@@ -164,10 +175,13 @@ void readWrite(int socketFD) {
             int bytesRead = read(socketFD, &buffer, sizeof(char)); // read from socketFD
             if (encryptFlag) { decrypt(&buffer, 1); } // if encryptFlag, decrypt socket data
             // TODO: if receive ^C, kill(pid, SIGINT);
-            if (buffer == '\003') {
-                kill(pid,SIGINT);
-            }
+            // if (buffer == '\003') {
+            //     kill(pid,SIGINT);
+            // }
             // TODO: if receive ^D, close(pipeToChild[1]); and harvest shell exit status
+            if (buffer == '\004') {
+                shutdownServer();
+            }
             if (buffer == '\r' || buffer == '\n') {
                 char shellBuffer[1] = {'\n'};
                 write(pipeToChild[1], &shellBuffer, sizeof(char));
