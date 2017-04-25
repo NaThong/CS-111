@@ -87,23 +87,23 @@ void initializeEncryption(char *key, int keyLength) {
     // INIT ENCRYPTION
     cryptFD = mcrypt_module_open("blowfish", NULL, "cfb", NULL);
     if (cryptFD == MCRYPT_FAILED) {
-	fprintf(stderr, "error: error in opening module\n");
-	exit(EXIT_FAILURE);
+        fprintf(stderr, "error: error in opening module\n");
+        exit(EXIT_FAILURE);
     }
     if (mcrypt_generic_init(cryptFD, key, keyLength, NULL) < 0) {
-	fprintf(stderr, "error: error in initializing encryption\n");
-	exit(EXIT_FAILURE);
+        fprintf(stderr, "error: error in initializing encryption\n");
+        exit(EXIT_FAILURE);
     }
 
     // INIT DECRYPTION
     decryptFD = mcrypt_module_open("blowfish", NULL, "cfb", NULL);
     if (decryptFD == MCRYPT_FAILED) {
-	fprintf(stderr, "error: error in opening module\n");
-	exit(EXIT_FAILURE);
+        fprintf(stderr, "error: error in opening module\n");
+        exit(EXIT_FAILURE);
     }
     if (mcrypt_generic_init(decryptFD, key, keyLength, NULL) < 0) {
-	fprintf(stderr, "error: error in initializing decryption\n");
-	exit(EXIT_FAILURE);
+        fprintf(stderr, "error: error in initializing decryption\n");
+        exit(EXIT_FAILURE);
     }
 }
 
@@ -149,46 +149,48 @@ void readWrite(socketFD) {
         if ((pollfdArray[0].revents & POLLIN)) {
             int bytesRead = read(0, &buffer, sizeof(char)); // read from keyboard
             /*if (buffer == '\003') {
-                // TODO: something here that ends program and closes socket
+            // TODO: something here that ends program and closes socket
+            // TODO: client should not check for ^C or ^D but should send it to server instead
+            if (buffer == '\003') {
                 exit(0);
             }*/
             if (buffer == '\r' || buffer == '\n') {
                 char tempBuffer[2] = {'\r','\n'};	
                 write(1, &tempBuffer, 2*sizeof(char));
                 if (encryptFlag) { encrypt(&buffer, 1); }
-		if (logFlag) {
-		    write(logFD, "SENT 1 bytes: ", 14);
-		    write(logFD, &buffer, sizeof(char));
-		    write(logFD, "\n", sizeof(char));
-		}
+                if (logFlag) {
+                    write(logFD, "SENT 1 bytes: ", 14);
+                    write(logFD, &buffer, sizeof(char));
+                    write(logFD, "\n", sizeof(char));
+                }
                 write(socketFD, &buffer, sizeof(char));
                 continue;
             }
-	    write(1, &buffer, sizeof(char)); // write to screen
-            if (encryptFlag) { encrypt(&buffer, 1); } // encrypt socket data
-	    if (logFlag) {
+            write(1, &buffer, sizeof(char));            // write to screen
+            if (encryptFlag) { encrypt(&buffer, 1); }   // encrypt keyboard data
+            if (logFlag) {                              // write to log
                 write(logFD, "SENT 1 bytes: ", 14);
                 write(logFD, &buffer, sizeof(char));
                 write(logFD, "\n", 1);
             }
-            write(socketFD, &buffer, sizeof(char)); // write to socket
+            write(socketFD, &buffer, sizeof(char));     // write to socket
         }
 
         // if socket pollFD has POLLIN (has output to read)
         if ((pollfdArray[1].revents & POLLIN)) {
-            int bytesRead = read(socketFD, &buffer, sizeof(char)); // read from socket
-	    if (logFlag) {
-		write(logFD, "RECEIVED 1 bytes: ", 17);
-		write(logFD, &buffer, sizeof(char));
-		write(logFD, "\n", 1);
-	    }
-            if (encryptFlag) { decrypt(&buffer, 1); }
+            int bytesRead = read(socketFD, &buffer, sizeof(char));  // read from socket
+            if (logFlag) {                                          // write to log
+                write(logFD, "RECEIVED 1 bytes: ", 17);
+                write(logFD, &buffer, sizeof(char));
+                write(logFD, "\n", 1);
+            }
+            if (encryptFlag) { decrypt(&buffer, 1); }               // decrypt socket data
             if (buffer == '\r' || buffer == '\n') {
                 char tempBuffer[2] = {'\r','\n'};
                 write(1, &tempBuffer, 2*sizeof(char));
                 continue;
             }
-            write(1, &buffer, sizeof(char)); // write to screen
+            write(1, &buffer, sizeof(char));                        // write to screen
         }
 
         // error checking from socket pollFD

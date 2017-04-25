@@ -60,23 +60,23 @@ void initializeEncryption(char *key, int keyLength) {
     // INIT ENCRYPTION
     cryptFD = mcrypt_module_open("blowfish", NULL, "cfb", NULL);
     if (cryptFD == MCRYPT_FAILED) {
-	fprintf(stderr, "error: error in opening module\n");
-	exit(EXIT_FAILURE);
+        fprintf(stderr, "error: error in opening module\n");
+        exit(EXIT_FAILURE);
     }
     if (mcrypt_generic_init(cryptFD, key, keyLength, NULL) < 0) {
-	fprintf(stderr, "error: error in initializing encryption\n");
-	exit(EXIT_FAILURE);
+        fprintf(stderr, "error: error in initializing encryption\n");
+        exit(EXIT_FAILURE);
     }
 
     // INIT DECRYPTION
     decryptFD = mcrypt_module_open("blowfish", NULL, "cfb", NULL);
     if (decryptFD == MCRYPT_FAILED) {
-	fprintf(stderr, "error: error in opening module\n");
-	exit(EXIT_FAILURE);
+        fprintf(stderr, "error: error in opening module\n");
+        exit(EXIT_FAILURE);
     }
     if (mcrypt_generic_init(decryptFD, key, keyLength, NULL) < 0) {
-	fprintf(stderr, "error: error in initializing decryption\n");
-	exit(EXIT_FAILURE);
+        fprintf(stderr, "error: error in initializing decryption\n");
+        exit(EXIT_FAILURE);
     }
 }
 
@@ -96,14 +96,14 @@ void decrypt(char *buffer, int decryptLength) {
 
 void signalHandler(int signal) {
     if (signal == SIGINT) {
-	kill(pid, SIGINT);
+	    kill(pid, SIGINT);
     }
 }
 
 void createPipe(int pipeHolder[2]) {
     if (pipe(pipeHolder) == -1) {
-	fprintf(stderr, "error: error in creating pipe");
-	exit(1);
+        fprintf(stderr, "error: error in creating pipe");
+        exit(1);
     }
 }
 
@@ -130,6 +130,17 @@ void execShell() {
     }
 }
 
+void closeAllFD() {
+    close(pipeToChild[1]);
+    close(pipeToParent[0]);
+    close(newSocketFD);
+    close(socketFD);
+}
+
+void shutdownServer() {
+    closeAllFD();
+}
+
 void readWrite(int socketFD) {
     struct pollfd pollfdArray[2]; // array of pollfd strctures
     pollfdArray[0].fd = socketFD; // first pollfd describes socket
@@ -152,6 +163,11 @@ void readWrite(int socketFD) {
         if ((pollfdArray[0].revents & POLLIN)) {
             int bytesRead = read(socketFD, &buffer, sizeof(char)); // read from socketFD
             if (encryptFlag) { decrypt(&buffer, 1); } // if encryptFlag, decrypt socket data
+            // TODO: if receive ^C, kill(pid, SIGINT);
+            if (buffer == '\003') {
+                kill(pid,SIGINT);
+            }
+            // TODO: if receive ^D, close(pipeToChild[1]); and harvest shell exit status
             if (buffer == '\r' || buffer == '\n') {
                 char shellBuffer[1] = {'\n'};
                 write(pipeToChild[1], &shellBuffer, sizeof(char));
@@ -250,5 +266,6 @@ int main(int argc, char *argv[]) {
         readWrite(newSocketFD);
     }
 
+    deinitializeEncryption(); //deinitialize encryption before exiting
     exit(0);
 }
