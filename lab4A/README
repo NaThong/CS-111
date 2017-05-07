@@ -2,4 +2,23 @@ NAME: Jeffrey Chan
 EMAIL: jeffschan97@gmail.com
 ID: 004-611-638
 
+Serial Number: A502PWCC
+Mac Address: 90:b6:86:0c:29:58
 
+Included Files:
+
+edison-selfie.jpg - selfie of me with my edison board
+
+ifcongif.png - screenshot of running the ifconfig command within the edison
+to get its IP and MAC address. Does not include the process of giving it a
+name, password, or setting up it's wifi, but those should be implied.
+
+scp.png - screenshot of the scp command I used to send over a hello.c source
+file over to the edison.
+
+compilation.png - screenshot of the gcc command I used within the edison to
+compile hello.c into the hello executable, and running it. It printed out
+"Hello, world." as expected.
+
+git-clone.png - screenshot of the git clone command I ran to clone of my
+old git repo's onto the Edison.
