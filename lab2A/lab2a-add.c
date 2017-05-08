@@ -10,17 +10,31 @@
 
 #define BILL 1000000000L
 
+// gloabl variables
+int numThreads = 1;
+int numIterations = 1;
+long long counter = 0;
+
 // provided add function
 void add (long long *pointer, long long value) {
     long long sum = *pointer + value;
     *pointer = sum;
 }
 
+void* add_one (void *pointer) {
+    pointer = (long long*) pointer;
+
+    int i = 0;
+    for (i = 0; i < numIterations; i++) {
+	add(pointer, 1);
+    }
+    for (i = 0; i < numIterations; i++) {
+	add(pointer, -1);
+    }
+}
+
 int main(int argc, char **argv) {
     int option = 0; // used to hold option
-    int numThreads = 1; // # threads defaulted to 1
-    int numIterations = 1; // # iterations defaulted to 1
-    long long counter = 0; // long long counter initialized to 0
 
     // arguments this program supports
     static struct option options[] = {
@@ -52,7 +66,7 @@ int main(int argc, char **argv) {
     pthread_t *threads = malloc(numThreads * sizeof(pthread_t));
     int k;
     for (k = 0; k < numThreads; k++) {
-	if (pthread_create(threads + k, NULL, &add, &counter)) {
+	if (pthread_create(threads + k, NULL, add_one, &counter)) {
 	    fprintf(stderr, "error: error in thread creation\n");
 	    exit(1);
 	}
@@ -70,8 +84,11 @@ int main(int argc, char **argv) {
     struct timespec end;
     if (clock_gettime(CLOCK_MONOTONIC, &end) == -1) { fprintf(stderr, "error: error in getting stop time\n"); exit(1); }
 
-    long totalTime = end.tv_sec - start.tv_sec + (end.tv_nsec - start.tv_nsec); // calculate total time elapsed
-    printf("totalTime: %d\n", totalTime);
+    long totalTime = BILL * (end.tv_sec - start.tv_sec) + (end.tv_nsec - start.tv_nsec); // calculate total time elapsed
+    int numOperations = numThreads * numIterations * 2; // calculate number of operations
+    int timePerOperation = totalTime / numOperations; // calculate the total time cost per operations
+    
+    printf("totalTime: %d counter: %d\n", totalTime, counter);
 
     exit(0);
 }
