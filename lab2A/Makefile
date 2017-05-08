@@ -7,7 +7,7 @@
 default: build
 
 build:
-	gcc -pthread -lrt -o lab2a-add -g lab2a-add.c
+	gcc -pthread -lrt -o lab2a_add -g lab2a_add.c
 
 tests:
 	echo "tests target"
@@ -16,7 +16,7 @@ graphs:
 	echo "graphs target"
 
 clean:
-	rm -f *.tar.gz
+	rm -f *.tar.gz lab2a_add
 
 dist:
 	tar -czf lab2a-004611638.tar.gz Makefile
