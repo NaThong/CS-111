@@ -8,7 +8,7 @@ default: build
 
 build:
 	gcc -pthread -lrt -o lab2_add -g lab2_add.c
-	gcc -pthread -lrt -o lab2_list -g lab2_list.c
+	gcc -pthread -lrt -o lab2_list -g SortedList.c lab2_list.c
 
 tests:
 	echo "tests target"
