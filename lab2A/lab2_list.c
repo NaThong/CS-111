@@ -16,7 +16,45 @@
 int numThreads = 1;
 int numIterations = 1;
 int opt_yield = 0;
+char syncOption;
 pthread_mutex_t mutex;
+SortedList_t* list;
+SortedListElement_t* elementList;
+
+void setYieldOption(char* yieldOptions) {
+    const char validYieldOptions = {'i', 'd', 'l'}; // initialize array of valid yield options
+    
+    // iterate through yield options and set opt_yield accordingly
+    int k = 0;
+    for (k = 0; *(yieldOptions + k) != '\0'; k++) {
+        if (*(yieldOptions + k) == validYieldOptions[0]) opt_yield |= INSERT_YIELD;
+        else if (*(yieldOptions + k) == validYieldOptions[1]) opt_yield |= DELETE_YIELD;
+        else if (*(yieldOptions + k) == validYieldOptions[2]) opt_yield |= LOOKUP_YIELD;
+        else {
+            fprintf(stderr, "error: invalid yield option. valid options: [idl]\n");
+            exit(1);
+        }
+    }
+}
+
+void generateRandomKeys(int totalElements) {
+    srand(time(NULL)); // initialize random number generator
+
+    // go through element list nad insert random keys
+    int k;
+    for (k = 0; k < totalElements; k++) {
+        int randNumber = rand() % 26; // bound rand number to an alphabet character
+        char* randKey = malloc(2 * sizeof(char)); // 1 char key + null byte
+        randKey[0] = 'a' + randNumber; // turn randNumber into character
+        randKey[1] = '\0';
+
+        elementList[k].key = randKey; // insert key into element
+    }
+}
+
+void listOperations(char* s) {
+    return;
+}
 
 int main(int argc, char **argv) {
     int option = 0; // used to hold option
@@ -25,7 +63,8 @@ int main(int argc, char **argv) {
     static struct option options[] = {
         {"threads", required_argument, 0, 't'},
         {"iterations", required_argument, 0, 'i'},
-        {"yield", required_argument, 0, 'y'}
+        {"yield", required_argument, 0, 'y'},
+        {"sync", required_argument, 0, 's'}
     };
 
     // iterate through options
@@ -37,13 +76,69 @@ int main(int argc, char **argv) {
             case 'i':
                 numIterations = atoi(optarg);
                 break;
-	    case 'y':
-		break; // TODO: implement yield option
+            case 'y':
+                setYieldOption(optarg);
+                break;
+            case 's':
+                if ((optarg[0] == 'm' || optarg[0] == 's') && strlen(optarg) == 1)
+                    syncOption = optarg[0];
+                else {
+                    fprintf(stderr, "error: unrecognized sync argument. recognized arguments: [ms]\n");
+                    exit(1);
+                }
             default:
                 fprintf(stderr, "error: unrecognized argument\nreocgnized arguments:\n--threads=#\n--iterations=#\n--yield=[idl]\n");
                 exit(1);
         }
     }
 
+    // initialize mutex if needed
+    if (syncOption == 'm') pthread_mutex_init(&mutex, NULL);
+
+    // initialize empty list with a head node
+    list = malloc(sizeof(SortedList_t));
+    list->key = NULL;
+    list->next = NULL;
+    list->prev = NULL;
+
+    // create required number of list elements with random keys
+    int totalElements = numThreads * numIterations;
+    elementList = malloc(totalElements * sizeof(SortedListElement_t));
+    generateRandomKeys(totalElements);
+
+    // creates the number of specified threads
+    pthread_t *threads = malloc(numThreads * sizeof(pthread_t));
+
+    // start timing
+    struct timespec start;
+    if (clock_gettime(CLOCK_MONOTONIC, &start) == -1) { fprintf(stderr, "error: error in getting start time\n"); exit(1); }
+
+    // runs the threads
+    int k;
+    for (k = 0; k < numThreads; k++) {
+        if (pthread_create(threads + k, NULL, listOperations, "Jeffrey")) {
+            fprintf(stderr, "error: error in thread creation\n");
+            exit(1);
+        }
+    }
+
+    // wait for all the threads to complete
+    for (k = 0; k < numThreads; k++) {
+        if (pthread_join(*(threads + k), NULL)) {
+            fprintf(stderr, "error: error in joining threads\n");
+            exit(1);
+        }
+    }
+
+    // stop timing
+    struct timespec end;
+    if (clock_gettime(CLOCK_MONOTONIC, &end) == -1) { fprintf(stderr, "error: error in getting stop time\n"); exit(1); }
+
+    long totalTime = BILL * (end.tv_sec - start.tv_sec) + (end.tv_nsec - start.tv_nsec); // calculate total time elapsed
+    int numberOfOperations = numThreads * numIterations * 3; // total operatinos performed
+    long costPerOperation = totalTime / numberOfOperations; // average cost per operation
+
+    int listLength = SortedList_length(list);
+    if (listLength != 0) exit(2); // exit 2 if list length is not 0
     exit(0);
 }

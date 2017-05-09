@@ -21,7 +21,7 @@ void SortedList_insert(SortedList_t *list, SortedListElement_t *element) {
 	prev = prev->next;
     }
 
-    if (opt_yield & INSERT_YIELD) pthread_yield(); // yield if needed
+    if (opt_yield & INSERT_YIELD) sched_yield(); // yield if needed
 
     // pointer reconnection to insert element into list
     prev->next = element;
@@ -37,14 +37,14 @@ int SortedList_delete(SortedListElement_t *element) {
     if (element->prev->next == element) {
 	// case: last element in list
 	if (element->next == NULL) {
-	    if (opt_yield & DELETE_YIELD) pthread_yield(); // yield if necessary
+	    if (opt_yield & DELETE_YIELD) sched_yield(); // yield if necessary
 
 	    element->prev->next = NULL; // detach last element in list
 	    return 0;
 	}
 	// case: element inbetween to other valid elements
 	else if (element->next->prev == element) {
-	    if (opt_yield & DELETE_YIELD) pthread_yield(); // yield if necessary
+	    if (opt_yield & DELETE_YIELD) sched_yield(); // yield if necessary
 
 	    // detach element from list
 	    element->prev->next = element->next;
@@ -53,7 +53,7 @@ int SortedList_delete(SortedListElement_t *element) {
 	}
     }
     
-    return 1; // pointers corrupted and insertion failed
+    return 1; // corrupted pointers
 }
 
 SortedListElement_t* SortedList_lookup(SortedList_t* list, const char *key) {
@@ -63,7 +63,7 @@ SortedListElement_t* SortedList_lookup(SortedList_t* list, const char *key) {
     while (curr != NULL ) {
 	if (strcmp(curr->key, key) == 0) return curr; // found element
 
-	if (opt_yield & LOOKUP_YIELD) pthread_yield(); // yield if needed
+	if (opt_yield & LOOKUP_YIELD) sched_yield(); // yield if needed
 	
 	curr = curr->next; // move onto next element
     }
@@ -79,7 +79,7 @@ int SortedList_length(SortedList_t *list) {
 
     while (curr != NULL) {
 	counter++;
-	if (opt_yield & LOOKUP_YIELD) pthread_yield();
+	if (opt_yield & LOOKUP_YIELD) sched_yield();
 	curr = curr->next;
     }
     
