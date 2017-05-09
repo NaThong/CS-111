@@ -125,7 +125,7 @@ int main(int argc, char **argv) {
 		}
 		break;
 	    default:
-		fprintf(stderr, "error: unrecognized argument\nrecognized arguments:\n--threads=#\n--iterations=#\n");
+		fprintf(stderr, "error: unrecognized argument\nrecognized arguments:\n--threads=#\n--iterations=#\n--yield\n--sync=[msc]\n");
 		exit(1);
 	}
     }
