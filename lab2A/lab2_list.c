@@ -20,6 +20,7 @@ char syncOption;
 pthread_mutex_t mutex;
 SortedList_t* list;
 SortedListElement_t* elementList;
+int spinCondition = 0;
 
 void setYieldOption(char* yieldOptions) {
     const char validYieldOptions[] = {'i', 'd', 'l'}; // initialize array of valid yield options
@@ -52,8 +53,37 @@ void generateRandomKeys(int totalElements) {
     }
 }
 
-void* listOperations(void* s) {
-    return;
+void* listOperations(void* threadIndex) {
+    // iterate through elements with threads and insert them into list
+    int k;
+    int totalElements = numThreads * numIterations;
+    for (k= *(int*)threadIndex; k < totalElement; k += numThreads) {
+        // insert based on chosen synchronization option
+        switch (syncOption) {
+            case 'm':
+                // wrap insertion with mutex lock
+                pthread_mutex_lock(&mutex);
+                SortedList_insert(list, &elementList[k]);
+                pthread_mutex_unlock(&mutex);
+                break;
+            case 's':
+                // wrap insertion with spin condition
+                while (__sync_lock_test_and_set(&spinCondition));
+                SortedList_insert(list, &elementList[k]);
+                __sync_lock_release(&spinCondition);
+                break;
+            default:
+                // insert with no synchronization method
+                SortedList_insert(list, &elementList[k]); // insert with
+                break;
+        }
+    }
+
+    // get list length
+
+    // lookup and delete previously inserted elements
+
+    return NULL;
 }
 
 int main(int argc, char **argv) {
@@ -116,7 +146,7 @@ int main(int argc, char **argv) {
     // runs the threads
     int k;
     for (k = 0; k < numThreads; k++) {
-        if (pthread_create(threads + k, NULL, listOperations, "Jeffrey")) {
+        if (pthread_create(threads + k, NULL, listOperations, k)) {
             fprintf(stderr, "error: error in thread creation\n");
             exit(1);
         }
