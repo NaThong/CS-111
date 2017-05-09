@@ -102,7 +102,7 @@ void* listOperations(void* threadIndex) {
 
     // lookup and delete previously inserted elements
     SortedListElement_t *temp = NULL;
-    for (k = *(int*)threadIndex; j < totalElements; k += numThreads) {
+    for (k = *(int*)threadIndex; k < totalElements; k += numThreads) {
         // lookup and delete based on synchronization option
         switch (syncOption) {
             case 'm':
@@ -194,7 +194,7 @@ int main(int argc, char **argv) {
     // runs the threads
     int k;
     for (k = 0; k < numThreads; k++) {
-        if (pthread_create(threads + k, NULL, listOperations, k)) {
+        if (pthread_create(threads + k, NULL, listOperations, &k)) {
             fprintf(stderr, "error: error in thread creation\n");
             exit(1);
         }
