@@ -45,6 +45,12 @@ As the number of threads rises, there will not be enough CPU's for each thread,
 so some threads will have to waste their time slice waiting for the lock,
 which dramatically slows down the run time.
 
+2.2.1 - Scalability of Mutex
+
+
 Included Files:
+
+Use of Slip Days:
+1 Slip Day
 
 Resources:

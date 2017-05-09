@@ -21,6 +21,15 @@ pthread_mutex_t mutex;
 SortedList_t* list;
 SortedListElement_t* elementList;
 int spinCondition = 0;
+char returnString[50] = "";
+
+char* getTestTag() {
+    if (!syncOption) { strcat(returnString, "-none"); }
+    else if (syncOption == 'm') { strcat(returnString, "-m"); }
+    else if (syncOption == 's') { strcat(returnString, "-s"); }
+
+    return returnString;
+}
 
 void setYieldOption(char* yieldOptions) {
     const char validYieldOptions[] = {'i', 'd', 'l'}; // initialize array of valid yield options
@@ -146,7 +155,7 @@ int main(int argc, char **argv) {
     };
 
     // iterate through options
-    while ((option = getopt_long(argc, argv, "t:i:y", options, NULL)) != -1) {
+    while ((option = getopt_long(argc, argv, "t:i:y:s", options, NULL)) != -1) {
         switch (option) {
             case 't':
                 numThreads = atoi(optarg);
@@ -164,8 +173,9 @@ int main(int argc, char **argv) {
                     fprintf(stderr, "error: unrecognized sync argument. recognized arguments: [ms]\n");
                     exit(1);
                 }
+		break;
             default:
-                fprintf(stderr, "error: unrecognized argument\nreocgnized arguments:\n--threads=#\n--iterations=#\n--yield=[idl]\n");
+                fprintf(stderr, "error: unrecognized argument\nreocgnized arguments:\n--threads=#\n--iterations=#\n--yield=[idl]\n--sync=[ms]\n");
                 exit(1);
         }
     }
@@ -213,8 +223,12 @@ int main(int argc, char **argv) {
     if (clock_gettime(CLOCK_MONOTONIC, &end) == -1) { fprintf(stderr, "error: error in getting stop time\n"); exit(1); }
 
     long totalTime = BILL * (end.tv_sec - start.tv_sec) + (end.tv_nsec - start.tv_nsec); // calculate total time elapsed
-    int numberOfOperations = numThreads * numIterations * 3; // total operatinos performed
-    long costPerOperation = totalTime / numberOfOperations; // average cost per operation
+    int numOperations = numThreads * numIterations * 3; // total operatinos performed
+    long costPerOperation = totalTime / numOperations; // average cost per operation
+
+    // print test output
+    char* testTag = getTestTag();
+    printf("list%s,%d,%d,1,%d,%d,%d\n", testTag, numThreads, numIterations, numOperations, totalTime, costPerOperation);
 
     int listLength = SortedList_length(list);
     if (listLength != 0) exit(2); // exit 2 if list length is not 0
