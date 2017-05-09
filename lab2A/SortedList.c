@@ -78,9 +78,12 @@ int SortedList_length(SortedList_t *list) {
     SortedListElement_t* curr = list->next;
 
     while (curr != NULL) {
-	counter++;
-	if (opt_yield & LOOKUP_YIELD) sched_yield();
-	curr = curr->next;
+        counter++;
+        // check pointers in case list is corrupted
+        if (curr->prev->next != curr || (curr->next != NULL && curr->next->prev != curr))
+            return -1;
+        if (opt_yield & LOOKUP_YIELD) sched_yield();
+        curr = curr->next;
     }
     
     return counter;

@@ -41,7 +41,7 @@ void setYieldOption(char* yieldOptions) {
 void generateRandomKeys(int totalElements) {
     srand(time(NULL)); // initialize random number generator
 
-    // go through element list nad insert random keys
+    // go through element list and insert random keys
     int k;
     for (k = 0; k < totalElements; k++) {
         int randNumber = rand() % 26; // bound rand number to an alphabet character
@@ -57,7 +57,7 @@ void* listOperations(void* threadIndex) {
     // iterate through elements with threads and insert them into list
     int k;
     int totalElements = numThreads * numIterations;
-    for (k= *(int*)threadIndex; k < totalElement; k += numThreads) {
+    for (k= *(int*)threadIndex; k < totalElements; k += numThreads) {
         // insert based on chosen synchronization option
         switch (syncOption) {
             case 'm':
@@ -68,7 +68,7 @@ void* listOperations(void* threadIndex) {
                 break;
             case 's':
                 // wrap insertion with spin condition
-                while (__sync_lock_test_and_set(&spinCondition));
+                while (__sync_lock_test_and_set(&spinCondition, 1));
                 SortedList_insert(list, &elementList[k]);
                 __sync_lock_release(&spinCondition);
                 break;
@@ -80,8 +80,56 @@ void* listOperations(void* threadIndex) {
     }
 
     // get list length
+    switch (syncOption) {
+        case 'm':
+            // wrap lookup with mutex lock
+            pthread_mutex_lock(&mutex);
+            SortedList_length(list);
+            pthread_mutex_unlock(&mutex);
+        case 's':
+            // wrap lookup with spin condition
+            while (__sync_lock_test_and_set(&spinCondition, 1));
+            SortedList_length(list);
+            __sync_lock_release(&spinCondition);
+            break;
+        default:
+            if (SortedList_length(list) == -1) {
+                fprintf(stderr, "error: failed to get length of list\n");
+                exit(2);
+            }
+            break;
+    }
 
     // lookup and delete previously inserted elements
+    SortedListElement_t *temp = NULL;
+    for (k = *(int*)threadIndex; j < totalElements; k += numThreads) {
+        // lookup and delete based on synchronization option
+        switch (syncOption) {
+            case 'm':
+                // wrap lookup and delete with mutex lock
+                pthread_mutex_lock(&mutex);
+                temp = SortedList_lookup(list, elementList[k].key);
+                SortedList_delete(temp);
+                pthread_mutex_unlock(&mutex);
+                break;
+            case 's':
+                // wrap lookup and delete with spin condition
+                while (__sync_lock_test_and_set(&spinCondition, 1));
+                temp = SortedList_lookup(list, elementList[k].key);
+                SortedList_delete(temp);
+                __sync_lock_release(&spinCondition);
+                break;
+            default:
+                // lookup and delete with no synchronization method
+                temp = SortedList_lookup(list, elementList[k].key);
+                // if list corrupted, log error and exit with status
+                if (SortedList_delete(temp)) {
+                    fprintf(stderr, "error: failed to delete an element we already inserted\n");
+                    exit(2);
+                }
+                break;
+        }
+    }
 
     return NULL;
 }
