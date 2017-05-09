@@ -22,7 +22,7 @@ SortedList_t* list;
 SortedListElement_t* elementList;
 
 void setYieldOption(char* yieldOptions) {
-    const char validYieldOptions = {'i', 'd', 'l'}; // initialize array of valid yield options
+    const char validYieldOptions[] = {'i', 'd', 'l'}; // initialize array of valid yield options
     
     // iterate through yield options and set opt_yield accordingly
     int k = 0;
@@ -52,7 +52,7 @@ void generateRandomKeys(int totalElements) {
     }
 }
 
-void listOperations(char* s) {
+void* listOperations(void* s) {
     return;
 }
 
