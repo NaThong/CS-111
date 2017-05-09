@@ -19,6 +19,7 @@ char syncOption;
 long long counter = 0;
 pthread_mutex_t mutex;
 int spinCondition = 0;
+char returnString[50] = "";
 
 // provided add function
 void add (long long *pointer, long long value) {
@@ -44,6 +45,14 @@ void* add_one (void *pointer) {
 	    while (__sync_lock_test_and_set(&spinCondition, 1));
 	    add(pointer, 1);
 	    __sync_lock_release(&spinCondition);
+	} else if (syncOption == 'c') {
+	    long long prev;
+	    long long sum;
+	    do {
+		prev = counter;
+		sum = prev + 1;
+		if (yieldFlag) { sched_yield(); }
+	    } while (__sync_val_compare_and_swap(&counter, prev, sum) != prev);
 	} else {
 	    add(pointer, 1);
 	}
@@ -53,16 +62,35 @@ void* add_one (void *pointer) {
     for (i = 0; i < numIterations; i++) {
 	if (syncOption == 'm') {
 	    pthread_mutex_lock(&mutex);
-	    add(pointer, 1);
+	    add(pointer, -1);
 	    pthread_mutex_unlock(&mutex);
 	} else if (syncOption == 's') {
 	    while (__sync_lock_test_and_set(&spinCondition, 1));
-	    add(pointer, 1);
+	    add(pointer, -1);
 	    __sync_lock_release(&spinCondition);
+	} else if (syncOption == 'c') {
+	    long long prev;
+	    long long sum;
+	    do {
+		prev = counter;
+		sum = prev - 1;
+		if (yieldFlag) { sched_yield(); }
+	    } while (__sync_val_compare_and_swap(&counter,prev,sum) != prev);
 	} else {
 	    add(pointer, -1);
 	}
     }
+}
+
+char* getTestTag() {
+    if (yieldFlag) { strcat(returnString, "-yield"); }
+
+    if (!syncOption) { strcat(returnString, "-none"); }
+    else if (syncOption == 'm') { strcat(returnString, "-m"); }
+    else if (syncOption == 's') { strcat(returnString, "-s"); }
+    else if (syncOption == 'c') { strcat(returnString, "-c"); }
+
+    return returnString;
 }
 
 int main(int argc, char **argv) {
@@ -135,7 +163,8 @@ int main(int argc, char **argv) {
     int numOperations = numThreads * numIterations * 2; // calculate number of operations
     int timePerOperation = totalTime / numOperations; // calculate the total time cost per operations
     
-    printf("add-%s,%d,%d,%d,%d,%d,%d\n", "none", numThreads, numIterations, numOperations, totalTime, timePerOperation, counter);
+    char* testTag = getTestTag(); // get tag that corresponds to test we're running
+    printf("add%s,%d,%d,%d,%d,%d,%d\n", testTag, numThreads, numIterations, numOperations, totalTime, timePerOperation, counter);
 
     exit(0);
 }
