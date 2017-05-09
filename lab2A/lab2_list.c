@@ -17,7 +17,7 @@ int numThreads = 1;
 int numIterations = 1;
 int opt_yield = 0;
 char syncOption;
-char* yieldString;
+char* yieldString = "";
 pthread_mutex_t mutex;
 SortedList_t* list;
 SortedListElement_t* elementList;
@@ -236,6 +236,9 @@ int main(int argc, char **argv) {
     // stop timing
     struct timespec end;
     if (clock_gettime(CLOCK_MONOTONIC, &end) == -1) { fprintf(stderr, "error: error in getting stop time\n"); exit(1); }
+
+    free(elementList);
+    free(threads);
 
     long totalTime = BILL * (end.tv_sec - start.tv_sec) + (end.tv_nsec - start.tv_nsec); // calculate total time elapsed
     int numOperations = numThreads * numIterations * 3; // total operatinos performed
