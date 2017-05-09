@@ -17,6 +17,7 @@ int numThreads = 1;
 int numIterations = 1;
 int opt_yield = 0;
 char syncOption;
+char* yieldString;
 pthread_mutex_t mutex;
 SortedList_t* list;
 SortedListElement_t* elementList;
@@ -24,6 +25,19 @@ int spinCondition = 0;
 char returnString[50] = "";
 
 char* getTestTag() {
+    // append proper yield tag
+    if (strlen(yieldString) == 0) { strcat(returnString, "-none"); }
+    else {
+	strcat(returnString, "-");
+	int k = 0;
+	for (k = 0; *(yieldString + k) != '\0'; k++) {
+	    if (*(yieldString + k) == 'i') { strcat(returnString, "i"); }
+	    else if (*(yieldString + k) == 'd') { strcat(returnString, "d"); }
+	    else if (*(yieldString + k) == 'l') { strcat(returnString, "l"); }
+	}
+    }
+
+    // append proper sync tag
     if (!syncOption) { strcat(returnString, "-none"); }
     else if (syncOption == 'm') { strcat(returnString, "-m"); }
     else if (syncOption == 's') { strcat(returnString, "-s"); }
@@ -32,6 +46,7 @@ char* getTestTag() {
 }
 
 void setYieldOption(char* yieldOptions) {
+    yieldString = yieldOptions;
     const char validYieldOptions[] = {'i', 'd', 'l'}; // initialize array of valid yield options
     
     // iterate through yield options and set opt_yield accordingly
@@ -231,6 +246,6 @@ int main(int argc, char **argv) {
     printf("list%s,%d,%d,1,%d,%d,%d\n", testTag, numThreads, numIterations, numOperations, totalTime, costPerOperation);
 
     int listLength = SortedList_length(list);
-    if (listLength != 0) exit(2); // exit 2 if list length is not 0
+    if (listLength != 0) { exit(2); } // exit 2 if list length is not 0
     exit(0);
 }
