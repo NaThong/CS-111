@@ -87,84 +87,36 @@ void* listOperations(void* threadIndex) {
     // iterate through elements with threads and insert them into list
     int k;
     int totalElements = numThreads * numIterations;
-    for (k= *(int*)threadIndex; k < totalElements; k += numThreads) {
-        // insert based on chosen synchronization option
-        switch (syncOption) {
-            case 'm':
-                // wrap insertion with mutex lock
-                pthread_mutex_lock(&mutex);
-                SortedList_insert(list, &elementList[k]);
-                pthread_mutex_unlock(&mutex);
-                break;
-            case 's':
-                // wrap insertion with spin condition
-                while (__sync_lock_test_and_set(&spinCondition, 1));
-                SortedList_insert(list, &elementList[k]);
-                __sync_lock_release(&spinCondition);
-                break;
-            default:
-                // insert with no synchronization method
-                SortedList_insert(list, &elementList[k]); // insert with
-                break;
-        }
+
+    if (syncOption == 'm') { pthread_mutex_lock(&mutex); }
+    else if (syncOption == 's') { while (__sync_loc_test_and_set(&spinCondition, 1)); }
+
+    for (k= *(int*)threadIndex; k < totalElements; k += numThreads) {}
+        SortedList_insert(list, &elementList[k]);
     }
 
-    // get list length
-    switch (syncOption) {
-        case 'm':
-            // wrap lookup with mutex lock
-            pthread_mutex_lock(&mutex);
-            SortedList_length(list);
-            pthread_mutex_unlock(&mutex);
-	    break;
-        case 's':
-            // wrap lookup with spin condition
-            while (__sync_lock_test_and_set(&spinCondition, 1));
-            SortedList_length(list);
-            __sync_lock_release(&spinCondition);
-            break;
-        default:
-            if (SortedList_length(list) == -1) {
-                fprintf(stderr, "error: failed to get length of list\n");
-                exit(2);
-            }
-            break;
+    if (SortedList_length(list) == -1) {
+        fprintf(stderr, "error: failed to get length of list\n");
+        exit(2);
     }
 
     // lookup and delete previously inserted elements
     SortedListElement_t *temp = NULL;
     for (k = *(int*)threadIndex; k < totalElements; k += numThreads) {
-        // lookup and delete based on synchronization option
-        switch (syncOption) {
-            case 'm':
-                // wrap lookup and delete with mutex lock
-                pthread_mutex_lock(&mutex);
-                temp = SortedList_lookup(list, elementList[k].key);
-                SortedList_delete(temp);
-                pthread_mutex_unlock(&mutex);
-                break;
-            case 's':
-                // wrap lookup and delete with spin condition
-                while (__sync_lock_test_and_set(&spinCondition, 1));
-                temp = SortedList_lookup(list, elementList[k].key);
-                SortedList_delete(temp);
-                __sync_lock_release(&spinCondition);
-                break;
-            default:
-                // lookup and delete with no synchronization method
-                temp = SortedList_lookup(list, elementList[k].key);
+        temp = SortedList_lookup(list, elementList[k].key);
 		if (temp == NULL) {
 		    fprintf(stderr, "error: failed to find element we already inserted\n");
 		    exit(2);
 		}
-                // if list corrupted, log error and exit with status
-                if (SortedList_delete(temp)) {
-                    fprintf(stderr, "error: failed to delete an element we already inserted\n");
-                    exit(2);
-                }
-                break;
+        // if list corrupted, log error and exit with status
+        if (SortedList_delete(temp)) {
+            fprintf(stderr, "error: failed to delete an element we already inserted\n");
+            exit(2);
         }
     }
+
+    if (syncOption == 'm') { pthread_mutex_unlock(&mutex); }
+    else if (syncOption == 's') { __sync_lock_release(&exclusion); }
 
     return NULL;
 }
