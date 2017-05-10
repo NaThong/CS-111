@@ -1,25 +1,27 @@
-#define _GNU_SOURCE
+// NAME: Jeffrey Chan
+// EMAIL: jeffschan97@gmail.com
+// ID: 004-611638
+
 #include "SortedList.h"
 #include <pthread.h>
 #include <string.h>
+#include<stdlib.h>
 
 void SortedList_insert(SortedList_t *list, SortedListElement_t *element)
 {
-	if(list == NULL || element == NULL) { return; }
+	if(list == NULL || element == NULL) { return; } // check for invalid arugments
 	SortedListElement_t *curr = list->next;
-	//Go through list as long as we dont point back to the head/dummy node
-	while(curr != list)
-	{
-		//If element's value is less than the current, then insert it before
-		if(strcmp(element->key, curr->key) <= 0)
-			break;
+
+	// iterate through list and find position to insert element
+	while(curr != list) {
+		if(strcmp(element->key, curr->key) <= 0) break;
 
 		curr  = curr->next;
 	}
-	if(opt_yield & INSERT_YIELD)
-		pthread_yield();
 
-	//Update pointers to add element before the current
+	if(opt_yield & INSERT_YIELD) sched_yield();
+
+	// do pointer reconnection between list elements
 	element->next = curr;
 	element->prev = curr->prev;
 	curr->prev->next = element;
@@ -28,47 +30,51 @@ void SortedList_insert(SortedList_t *list, SortedListElement_t *element)
 
 int SortedList_delete(SortedListElement_t *element)
 {
-	if(element == NULL) { return 1; }
-	//Make sure the pointers are not corrupted
-	if(element->next->prev == element->prev->next)
-	{
-		if(opt_yield & DELETE_YIELD)
-			pthread_yield();
-		//Detach element from list by connecting its previous to its next and vice-versa
+	if(element == NULL) { return 1; } // invalid arguments
+
+	// check if pointers are corrupted, then try to delete element
+	if(element->next->prev == element->prev->next) {
+		if(opt_yield & DELETE_YIELD) sched_yield();
+
+		// pointer reconnectino to delete element
 		element->prev->next = element->next;
 		element->next->prev = element->prev;
 		return 0;
 	}
-	return 1;
+
+	return 1; // failure to delete element
 }
 
 SortedListElement_t *SortedList_lookup(SortedList_t *list, const char *key)
 {
-	if(list == NULL || key == NULL) { return NULL; }
+	if(list == NULL || key == NULL) { return NULL; } // invalid arguments
 	SortedListElement_t *curr = list->next;
-	while(curr != list)
-	{
-		//Element found
-		if(strcmp(curr->key, key) == 0)
-			return curr;
-		if(opt_yield & SEARCH_YIELD)
-			pthread_yield();
+
+	// iterate through list and try to find element
+	while(curr != list) {
+		if(strcmp(curr->key, key) == 0) return curr;
+		
+		if(opt_yield & LOOKUP_YIELD) sched_yield();
+		
 		curr = curr->next;
 	}
-	return NULL;
+
+	return NULL; // couldn't find element
 }
 
-int SortedList_length(SortedList_t *list)
-{
-	int count = 0;
-	if(list == NULL) { return -1; }
+int SortedList_length(SortedList_t* list) {
+	if(list == NULL) { return -1; } // invalid arugments
 	SortedListElement_t *curr = list->next;
+
+	int count = 0;
 	while(curr != list)
 	{
 		count++;
-		if(opt_yield & SEARCH_YIELD)
-			pthread_yield();
+
+		if(opt_yield & LOOKUP_YIELD) sched_yield();
+		
 		curr = curr->next;
 	}
+	
 	return count;
 }

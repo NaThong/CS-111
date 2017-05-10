@@ -167,8 +167,8 @@ int main(int argc, char **argv) {
     // initialize empty list with a head node
     list = malloc(sizeof(SortedList_t));
     list->key = NULL;
-    list->next = NULL;
-    list->prev = NULL;
+    list->next = list;
+    list->prev = list;
 
     // create required number of list elements with random keys
     int totalElements = numThreads * numIterations;
