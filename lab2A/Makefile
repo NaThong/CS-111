@@ -10,11 +10,13 @@ build:
 	gcc -pthread -lrt -o lab2_add -g lab2_add.c
 	gcc -pthread -lrt -o lab2_list -g SortedList.c lab2_list.c
 
-tests:
-	echo "tests target"
+tests: clean build
+	bash sample.sh
 
-graphs:
-	echo "graphs target"
+graphs: clean tests
+	export PATH=/usr/local/cs/bin:$PATH
+	gnuplot ./lab2_add.gp
+	gnuplot ./lab2_list.gp
 
 clean:
 	rm -f *.tar.gz lab2_add lab2_list
