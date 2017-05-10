@@ -2,7 +2,7 @@
 # EMAIL: jeffschan97@gmail.com
 # ID: 004-611-638
 
-.SILENT:
+#.SILENT:
 
 default: build
 
