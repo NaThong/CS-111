@@ -9,6 +9,7 @@
 #include<pthread.h>
 #include<string.h>
 #include<time.h>
+#include<signal.h>
 
 #define BILL 1000000000L
 
@@ -43,6 +44,11 @@ char* getTestTag() {
     else if (syncOption == 's') { strcat(returnString, "-s"); }
 
     return returnString;
+}
+
+void segFaultHandler() {
+    fprintf(stderr, "error: segmentation fault\n");
+    exit(2);
 }
 
 void setYieldOption(char* yieldOptions) {
@@ -110,6 +116,7 @@ void* listOperations(void* threadIndex) {
             pthread_mutex_lock(&mutex);
             SortedList_length(list);
             pthread_mutex_unlock(&mutex);
+	    break;
         case 's':
             // wrap lookup with spin condition
             while (__sync_lock_test_and_set(&spinCondition, 1));
@@ -146,6 +153,10 @@ void* listOperations(void* threadIndex) {
             default:
                 // lookup and delete with no synchronization method
                 temp = SortedList_lookup(list, elementList[k].key);
+		if (temp == NULL) {
+		    fprintf(stderr, "error: failed to find element we already inserted\n");
+		    exit(2);
+		}
                 // if list corrupted, log error and exit with status
                 if (SortedList_delete(temp)) {
                     fprintf(stderr, "error: failed to delete an element we already inserted\n");
@@ -195,8 +206,11 @@ int main(int argc, char **argv) {
         }
     }
 
+    // handler for segmentation faults
+    signal(SIGSEGV, segFaultHandler);
+
     // initialize mutex if needed
-    if (syncOption == 'm') pthread_mutex_init(&mutex, NULL);
+    if (syncOption == 'm') { pthread_mutex_init(&mutex, NULL); }
 
     // initialize empty list with a head node
     list = malloc(sizeof(SortedList_t));
@@ -211,6 +225,7 @@ int main(int argc, char **argv) {
 
     // creates the number of specified threads
     pthread_t *threads = malloc(numThreads * sizeof(pthread_t));
+    int* threadIds = malloc(numThreads * sizeof(int));
 
     // start timing
     struct timespec start;
@@ -219,7 +234,8 @@ int main(int argc, char **argv) {
     // runs the threads
     int k;
     for (k = 0; k < numThreads; k++) {
-        if (pthread_create(threads + k, NULL, listOperations, &k)) {
+	threadIds[k] = k;
+        if (pthread_create(threads + k, NULL, listOperations, &threadIds[k])) {
             fprintf(stderr, "error: error in thread creation\n");
             exit(1);
         }
