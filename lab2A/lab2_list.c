@@ -89,9 +89,9 @@ void* listOperations(void* threadIndex) {
     int totalElements = numThreads * numIterations;
 
     if (syncOption == 'm') { pthread_mutex_lock(&mutex); }
-    else if (syncOption == 's') { while (__sync_loc_test_and_set(&spinCondition, 1)); }
+    else if (syncOption == 's') { while (__sync_lock_test_and_set(&spinCondition, 1)); }
 
-    for (k= *(int*)threadIndex; k < totalElements; k += numThreads) {}
+    for (k= *(int*)threadIndex; k < totalElements; k += numThreads) {
         SortedList_insert(list, &elementList[k]);
     }
 
@@ -116,7 +116,7 @@ void* listOperations(void* threadIndex) {
     }
 
     if (syncOption == 'm') { pthread_mutex_unlock(&mutex); }
-    else if (syncOption == 's') { __sync_lock_release(&exclusion); }
+    else if (syncOption == 's') { __sync_lock_release(&spinCondition); }
 
     return NULL;
 }
