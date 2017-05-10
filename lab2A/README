@@ -46,11 +46,56 @@ so some threads will have to waste their time slice waiting for the lock,
 which dramatically slows down the run time.
 
 2.2.1 - Scalability of Mutex
+Comparing the plots for the add program and the list program, both mutex curves
+seem to flatten out as the number of threads increases. This is because
+mutexes scale really well with increasing number of threads. When locking a
+critical section, mutexes put threads to sleep so that they don't waste time
+spinning. Therefore, the curves flattening out as the number of threads
+increase make sense. The only difference is that in the add curve, the
+average cost per opration increase from 1 thread to 4 threads, but this is
+probably becasue within the add program, the cost of thread creation weighs
+into the overall cost and causes this initial rise.
 
+2.2.2 - Scalability of Spin Locks
+Comparing the plots for the dd program and the list program, both
+spin lock curves show a general linear increase as the number of threads
+increases. As the number of threads increases, it just means that there are
+more threads that wastes the CPU's by spinning when it doesn't have the lock.
+Therefore the average cost per operation should be linearly proportional to
+the number of threads, and our plots make sense. There are no notable
+differences to note about the two plots.
 
 Included Files:
 
+Makefile: supports a build, tests, graphs, clean, dist target that does what is
+specified in the spec.
+
+README: file that contains answer to the questions, included files, and usage
+of slip days.
+
+SortedList.c: file that continas the implementations of SortedList methods,
+implemented as a circularly linked list
+
+SortedList.h: Definition of a SortedList_t and SortedListElement_t
+
+lab2_add-[1-5].png: plots for lab2_add data
+
+lab2_add.c: program that increments a counter and supports the arguments
+specified in the spec
+
+lab2_add.csv: test data used to form gnuplots
+
+lab2_add.gp: gnuplot script used to generate the plots
+
+lab2_list-[1-4].png: plots for lab2_list data
+
+lab2_list.c: program that inserts, gets length, lookup, and deletes notes
+from a sorted circularly linked list. Supports options as specified in the
+spec
+
+lab2_list.csv: test data used to generate the gnuplots
+
+lab2_list.gp: gnuplot script used to generate the plots
+
 Use of Slip Days:
 1 Slip Day
-
-Resources:
