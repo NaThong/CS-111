@@ -32,7 +32,7 @@ graphs:
 	echo "graphs target"
 
 clean:
-	rm -f *.tar.gz
+	rm -f *.tar.gz lab2_list
 
 dist:
 	tar -czf lab2b-004611638.tar.gz Makefile README

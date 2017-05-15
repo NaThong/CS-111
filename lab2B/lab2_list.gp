@@ -30,18 +30,18 @@ set datafile separator ","
 
 # PLOT 1: Throughput of synchronized lists
 set title "Plot 1: Throughput of Synchronized Lists"
-set xlabel "Threads"
+set xlabel "# Threads"
 set logscale x 10
 set ylabel "Throughput (operations / sec)"
 set logscale y 10
-set output 'lab2_list-1.png'
+set output 'lab2b_1.png'
 
 # grep out only single threaded, un-protected, non-yield results
 plot \
-     "< grep 'list-none-none,1,' lab2_list.csv" using ($3):($7) \
-	title 'raw' with linespoints lc rgb 'red', \
-     "< grep 'list-none-none,1,' lab2_list.csv" using ($3):($7)/(4*($3)) \
-	title '/4 x iterations' with linespoints lc rgb 'green'
+     "< grep 'list-none-m' lab2_list.csv" using (1000000000/($7)):($2) \
+	title 'Mutex' with linespoints lc rgb 'red', \
+     "< grep 'list-none-s' lab2_list.csv" using (1000000000/($7)):($2) \
+	title 'Spin-Lock' with linespoints lc rgb 'green'
 
 
 # set title "List-2: Unprotected Threads and Iterations that run without failure"
