@@ -38,9 +38,9 @@ set output 'lab2b_1.png'
 
 # grep out only single threaded, un-protected, non-yield results
 plot \
-     "< grep 'list-none-m' lab2_list.csv" using (1000000000/($7)):($2) \
+     "< grep 'list-none-m' lab2_list.csv" using ($2):(1000000000/($7)) \
 	title 'Mutex' with linespoints lc rgb 'red', \
-     "< grep 'list-none-s' lab2_list.csv" using (1000000000/($7)):($2) \
+     "< grep 'list-none-s' lab2_list.csv" using ($2):(1000000000/($7)) \
 	title 'Spin-Lock' with linespoints lc rgb 'green'
 
 
