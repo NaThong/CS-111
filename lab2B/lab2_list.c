@@ -339,7 +339,6 @@ int main(int argc, char **argv) {
     struct timespec end;
     if (clock_gettime(CLOCK_MONOTONIC, &end) == -1) { fprintf(stderr, "error: error in getting stop time\n"); exit(1); }
 
-    free(listArray);
     free(mutexArray);
     free(elementList);
     free(threads);
@@ -353,9 +352,8 @@ int main(int argc, char **argv) {
     printf("list%s,%d,%d,%d,%d,%d,%d,%d\n", testTag, numThreads, numIterations, numLists, numOperations, totalTime, costPerOperation,averageLockWaitTime);
 
     // check length of all sublists
-    int listLength;
-    int i;
-    for (i = 0; i < numLists; i++) { listLength += SortedList_length(&listArray[i]); }
+    int listLength = 0;
+    for (m = 0; m < numLists; m++) { listLength += SortedList_length(&listArray[m]); }
     if (listLength != 0) { exit(2); } // exit 2 if list length is not 0
 
     exit(0);

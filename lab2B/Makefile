@@ -2,7 +2,7 @@
 # EMAIL: jeffschan97@gmail.com
 # ID: 004-611-638
 
-.SILENT:
+#.SILENT:
 
 default: build
 
@@ -60,7 +60,8 @@ graphs:
 	gnuplot ./lab2_list.gp
 
 clean:
-	rm -f *.tar.gz lab2_list lab2_list.csv lab2b_1.png
+	rm -f *.tar.gz lab2_list lab2_list.csv lab2b_1.png lab2b_2.png \
+	lab2b_3.png lab2b_4.png lab2b_5.png
 
 dist:
 	tar -czf lab2b-004611638.tar.gz Makefile README
