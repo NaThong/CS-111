@@ -31,7 +31,7 @@ set datafile separator ","
 # PLOT 1: Throughput of synchronized lists
 set title "Plot 1: Throughput of Synchronized Lists"
 set xlabel "# Threads"
-set logscale x 10
+set xrange[0:30]
 set ylabel "Throughput (operations / sec)"
 set logscale y 10
 set output 'lab2b_1.png'

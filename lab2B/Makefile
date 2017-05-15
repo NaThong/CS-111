@@ -9,7 +9,7 @@ default: build
 build:
 	gcc -pthread -lrt -o lab2_list -g SortedList.c lab2_list.c
 
-tests:
+tests: clean build
 	./lab2_list --threads=1  --iterations=1000 --sync=m >> lab2_list.csv
 	./lab2_list --threads=2  --iterations=1000 --sync=m >> lab2_list.csv
 	./lab2_list --threads=4  --iterations=1000 --sync=m >> lab2_list.csv
@@ -29,10 +29,10 @@ profile:
 	echo "profile target"
 
 graphs:
-	echo "graphs target"
+	gnuplot ./lab2_list.gp
 
 clean:
-	rm -f *.tar.gz lab2_list
+	rm -f *.tar.gz lab2_list lab2_list.csv lab2b_1.png
 
 dist:
 	tar -czf lab2b-004611638.tar.gz Makefile README
