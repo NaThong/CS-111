@@ -88,26 +88,24 @@ void* listOperations(void* threadIndex) {
     // iterate through elements with threads and insert them into list
     int k;
     int totalElements = numThreads * numIterations;
+    struct timespec lockWaitStart;
+    struct timespec lockWaitEnd;
 
     for (k= *(int*)threadIndex; k < totalElements; k += numThreads) {
 	switch (syncOption) {
 	    case 'm':
-      struct timespec lockWaitStart;
-      if (clock_gettime(CLOCK_MONOTONIC, &lockWaitStart) == -1) { fprintf(stderr, "error: error in getting start time\n"); exit(1); }
+      		if (clock_gettime(CLOCK_MONOTONIC, &lockWaitStart) == -1) { fprintf(stderr, "error: error in getting start time\n"); exit(1); }
 		pthread_mutex_lock(&mutex);
-    struct timespec lockWaitEnd;
-    if (clock_gettime(CLOCK_MONOTONIC, &lockWaitEnd) == -1) { fprintf(stderr, "error: error in getting stop time\n"); exit(1); }
-    lockWaitTime += BILL * (lockWaitEnd.tv_sec - lockWaitStart.tv_sec) + (lockWaitEnd.tv_nsec - lockWaitEnd.tv_nsec);
+    		if (clock_gettime(CLOCK_MONOTONIC, &lockWaitEnd) == -1) { fprintf(stderr, "error: error in getting stop time\n"); exit(1); }
+    		lockWaitTime += BILL * (lockWaitEnd.tv_sec - lockWaitStart.tv_sec) + (lockWaitEnd.tv_nsec - lockWaitEnd.tv_nsec);
 		SortedList_insert(list, &elementList[k]);
 		pthread_mutex_unlock(&mutex);
 		break;
 	    case 's':
-      struct timespec lockWaitStart;
-      if (clock_gettime(CLOCK_MONOTONIC, &lockWaitStart) == -1) { fprintf(stderr, "error: error in getting start time\n"); exit(1); }
+     		if (clock_gettime(CLOCK_MONOTONIC, &lockWaitStart) == -1) { fprintf(stderr, "error: error in getting start time\n"); exit(1); }
 		while(__sync_lock_test_and_set(&spinCondition, 1));
-    struct timespec lockWaitEnd;
-    if (clock_gettime(CLOCK_MONOTONIC, &lockWaitEnd) == -1) { fprintf(stderr, "error: error in getting stop time\n"); exit(1); }
-    lockWaitTime += BILL * (lockWaitEnd.tv_sec - lockWaitStart.tv_sec) + (lockWaitEnd.tv_nsec - lockWaitEnd.tv_nsec);
+		if (clock_gettime(CLOCK_MONOTONIC, &lockWaitEnd) == -1) { fprintf(stderr, "error: error in getting stop time\n"); exit(1); }
+    		lockWaitTime += BILL * (lockWaitEnd.tv_sec - lockWaitStart.tv_sec) + (lockWaitEnd.tv_nsec - lockWaitEnd.tv_nsec);
 		SortedList_insert(list, &elementList[k]);
 		__sync_lock_release(&spinCondition);
 		break;
@@ -119,12 +117,10 @@ void* listOperations(void* threadIndex) {
 
     switch (syncOption) {
 	case 'm':
-  struct timespec lockWaitStart;
-  if (clock_gettime(CLOCK_MONOTONIC, &lockWaitStart) == -1) { fprintf(stderr, "error: error in getting start time\n"); exit(1); }
+	    if (clock_gettime(CLOCK_MONOTONIC, &lockWaitStart) == -1) { fprintf(stderr, "error: error in getting start time\n"); exit(1); }
 	    pthread_mutex_lock(&mutex);
-      struct timespec lockWaitEnd;
-      if (clock_gettime(CLOCK_MONOTONIC, &lockWaitEnd) == -1) { fprintf(stderr, "error: error in getting stop time\n"); exit(1); }
-      lockWaitTime += BILL * (lockWaitEnd.tv_sec - lockWaitStart.tv_sec) + (lockWaitEnd.tv_nsec - lockWaitEnd.tv_nsec);
+	    if (clock_gettime(CLOCK_MONOTONIC, &lockWaitEnd) == -1) { fprintf(stderr, "error: error in getting stop time\n"); exit(1); }
+      	    lockWaitTime += BILL * (lockWaitEnd.tv_sec - lockWaitStart.tv_sec) + (lockWaitEnd.tv_nsec - lockWaitEnd.tv_nsec);
     	    if (SortedList_length(list) == -1) {
             	fprintf(stderr, "error: failed to get length of list\n");
             	exit(2);
@@ -132,12 +128,10 @@ void* listOperations(void* threadIndex) {
 	    pthread_mutex_unlock(&mutex);
 	    break;
 	case 's':
-  struct timespec lockWaitStart;
-  if (clock_gettime(CLOCK_MONOTONIC, &lockWaitStart) == -1) { fprintf(stderr, "error: error in getting start time\n"); exit(1); }
+	    if (clock_gettime(CLOCK_MONOTONIC, &lockWaitStart) == -1) { fprintf(stderr, "error: error in getting start time\n"); exit(1); }
 	    while (__sync_lock_test_and_set(&spinCondition, 1));
-      struct timespec lockWaitEnd;
-      if (clock_gettime(CLOCK_MONOTONIC, &lockWaitEnd) == -1) { fprintf(stderr, "error: error in getting stop time\n"); exit(1); }
-      lockWaitTime += BILL * (lockWaitEnd.tv_sec - lockWaitStart.tv_sec) + (lockWaitEnd.tv_nsec - lockWaitEnd.tv_nsec);
+      	    if (clock_gettime(CLOCK_MONOTONIC, &lockWaitEnd) == -1) { fprintf(stderr, "error: error in getting stop time\n"); exit(1); }
+      	    lockWaitTime += BILL * (lockWaitEnd.tv_sec - lockWaitStart.tv_sec) + (lockWaitEnd.tv_nsec - lockWaitEnd.tv_nsec);
 	    if (SortedList_length(list) == -1) {
 		fprintf(stderr, "error: failed to get length of list\n");
 		exit(2);
@@ -157,10 +151,8 @@ void* listOperations(void* threadIndex) {
     for (k = *(int*)threadIndex; k < totalElements; k += numThreads) {
       switch (syncOption) {
         case 'm':
-        struct timespec lockWaitStart;
-        if (clock_gettime(CLOCK_MONOTONIC, &lockWaitStart) == -1) { fprintf(stderr, "error: error in getting start time\n"); exit(1); }
+  	  if (clock_gettime(CLOCK_MONOTONIC, &lockWaitStart) == -1) { fprintf(stderr, "error: error in getting start time\n"); exit(1); }
           pthread_mutex_lock(&mutex);
-          struct timespec lockWaitEnd;
           if (clock_gettime(CLOCK_MONOTONIC, &lockWaitEnd) == -1) { fprintf(stderr, "error: error in getting stop time\n"); exit(1); }
           lockWaitTime += BILL * (lockWaitEnd.tv_sec - lockWaitStart.tv_sec) + (lockWaitEnd.tv_nsec - lockWaitEnd.tv_nsec);
           temp = SortedList_lookup(list, elementList[k].key);
@@ -175,10 +167,8 @@ void* listOperations(void* threadIndex) {
           pthread_mutex_unlock(&mutex);
           break;
         case 's':
-        struct timespec lockWaitStart;
-        if (clock_gettime(CLOCK_MONOTONIC, &lockWaitStart) == -1) { fprintf(stderr, "error: error in getting start time\n"); exit(1); }
+          if (clock_gettime(CLOCK_MONOTONIC, &lockWaitStart) == -1) { fprintf(stderr, "error: error in getting start time\n"); exit(1); }
           while (__sync_lock_test_and_set(&spinCondition, 1));
-          struct timespec lockWaitEnd;
           if (clock_gettime(CLOCK_MONOTONIC, &lockWaitEnd) == -1) { fprintf(stderr, "error: error in getting stop time\n"); exit(1); }
           lockWaitTime += BILL * (lockWaitEnd.tv_sec - lockWaitStart.tv_sec) + (lockWaitEnd.tv_nsec - lockWaitEnd.tv_nsec);
           temp = SortedList_lookup(list, elementList[k].key);
@@ -299,10 +289,11 @@ int main(int argc, char **argv) {
     long totalTime = BILL * (end.tv_sec - start.tv_sec) + (end.tv_nsec - start.tv_nsec); // calculate total time elapsed
     int numOperations = numThreads * numIterations * 3; // total operatinos performed
     long costPerOperation = totalTime / numOperations; // average cost per operation
+    long averageLockWaitTime = lockWaitTime / numOperations; // average wait-for-lock
 
     // print test output
     char* testTag = getTestTag();
-    printf("list%s,%d,%d,1,%d,%d,%d\n", testTag, numThreads, numIterations, numOperations, totalTime, costPerOperation);
+    printf("list%s,%d,%d,1,%d,%d,%d,%d\n", testTag, numThreads, numIterations, numOperations, totalTime, costPerOperation,averageLockWaitTime);
 
     int listLength = SortedList_length(list);
     if (listLength != 0) { exit(2); } // exit 2 if list length is not 0
