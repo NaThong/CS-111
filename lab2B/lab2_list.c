@@ -23,7 +23,6 @@ int numLists = 1;
 // global data structures
 SortedList_t* listArray;
 SortedListElement_t* elementList;
-pthread_mutex_t mutex;
 pthread_mutex_t* mutexArray;
 int* spinArray;
 long lockWaitTime = 0;
@@ -305,7 +304,7 @@ int main(int argc, char **argv) {
     generateRandomKeys(totalElements);
 
     // calculate which lists each element should go into using hash function
-    listNumber = malloc(numLists * sizeof(int));
+    listNumber = malloc(totalElements * sizeof(int));
     int m;
     for (m = 0; m < totalElements; m++)
       listNumber[m] = hash(elementList[m].key);
