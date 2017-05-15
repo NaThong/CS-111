@@ -54,7 +54,7 @@ void segFaultHandler() {
 void setYieldOption(char* yieldOptions) {
     yieldString = yieldOptions;
     const char validYieldOptions[] = {'i', 'd', 'l'}; // initialize array of valid yield options
-    
+
     // iterate through yield options and set opt_yield accordingly
     int k = 0;
     for (k = 0; *(yieldOptions + k) != '\0'; k++) {
@@ -134,16 +134,44 @@ void* listOperations(void* threadIndex) {
     // lookup and delete previously inserted elements
     SortedListElement_t *temp = NULL;
     for (k = *(int*)threadIndex; k < totalElements; k += numThreads) {
-        temp = SortedList_lookup(list, elementList[k].key);
-	if (temp == NULL) {
-	    fprintf(stderr, "error: failed to find element we already inserted\n");
-	    exit(2);
-	}
-        // if list corrupted, log error and exit with status
-        if (SortedList_delete(temp)) {
-            fprintf(stderr, "error: failed to delete an element we already inserted\n");
-            exit(2);
-        }
+      switch (syncOption) {
+        case 'm':
+          pthread_mutex_lock(&mutex);
+          temp = SortedList_lookup(list, elementList[k].key);
+          if (temp == NULL) {
+              fprintf(stderr, "error: failed to find element we already inserted\n");
+              exit(2);
+          }
+          if (SortedList_delete(temp)) {
+              fprintf(stderr, "error: failed to delete an element we already inserted\n");
+              exit(2);
+          }
+          pthread_mutex_unlock(&mutex);
+          break;
+        case 's':
+          while (__sync_lock_test_and_set(&spinCondition, 1));
+          temp = SortedList_lookup(list, elementList[k].key);
+          if (temp == NULL) {
+              fprintf(stderr, "error: failed to find element we already inserted\n");
+              exit(2);
+          }
+          if (SortedList_delete(temp)) {
+              fprintf(stderr, "error: failed to delete an element we already inserted\n");
+              exit(2);
+          }
+          __sync_lock_release(&spinCondition);
+          break;
+        default:
+          temp = SortedList_lookup(list, elementList[k].key);
+          if (temp == NULL) {
+              fprintf(stderr, "error: failed to find element we already inserted\n");
+              exit(2);
+          }
+          if (SortedList_delete(temp)) {
+              fprintf(stderr, "error: failed to delete an element we already inserted\n");
+              exit(2);
+          }
+      }
     }
 
     return NULL;
