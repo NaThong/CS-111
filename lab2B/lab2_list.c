@@ -85,12 +85,12 @@ void generateRandomKeys(int totalElements) {
 }
 
 void* listOperations(void* threadIndex) {
-    // iterate through elements with threads and insert them into list
     int k;
     int totalElements = numThreads * numIterations;
     struct timespec lockWaitStart;
     struct timespec lockWaitEnd;
 
+    // iterate through elements with threads and insert them into list
     for (k= *(int*)threadIndex; k < totalElements; k += numThreads) {
 	switch (syncOption) {
 	    case 'm':
@@ -145,7 +145,10 @@ void* listOperations(void* threadIndex) {
     for (k = *(int*)threadIndex; k < totalElements; k += numThreads) {
       switch (syncOption) {
         case 'm':
+          if (clock_gettime(CLOCK_MONOTONIC, &lockWaitStart) == -1) { fprintf(stderr, "error: error in getting start time\n"); exit(1); }
           pthread_mutex_lock(&mutex);
+          if (clock_gettime(CLOCK_MONOTONIC, &lockWaitEnd) == -1) { fprintf(stderr, "error: error in getting stop time\n"); exit(1); }
+          lockWaitTime += BILL * (lockWaitEnd.tv_sec - lockWaitStart.tv_sec) + (lockWaitEnd.tv_nsec - lockWaitEnd.tv_nsec);
           temp = SortedList_lookup(list, elementList[k].key);
           if (temp == NULL) {
               fprintf(stderr, "error: failed to find element we already inserted\n");
