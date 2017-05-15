@@ -13,19 +13,27 @@
 
 #define BILL 1000000000L
 
-// global variables
+// global argument variables
 int numThreads = 1;
 int numIterations = 1;
 int opt_yield = 0;
 char syncOption;
-char* yieldString = "";
-pthread_mutex_t mutex;
-SortedList_t* list;
-SortedListElement_t* elementList;
-int spinCondition = 0;
-char returnString[50] = "";
-long lockWaitTime = 0;
+int numLists = 1;
 
+// global data structures
+SortedList_t* listArray;
+SortedListElement_t* elementList;
+pthread_mutex_t mutex;
+pthread_mutex_t* mutexArray;
+int* spinArray;
+long lockWaitTime = 0;
+int* listNumber;
+
+// strings
+char* yieldString = "";
+char returnString[50] = "";
+
+// formats tags for test outpu
 char* getTestTag() {
     // append proper yield tag
     if (strlen(yieldString) == 0) { strcat(returnString, "-none"); }
@@ -47,11 +55,13 @@ char* getTestTag() {
     return returnString;
 }
 
+// sementation fault handler
 void segFaultHandler() {
     fprintf(stderr, "error: segmentation fault\n");
     exit(2);
 }
 
+// yield option handler
 void setYieldOption(char* yieldOptions) {
     yieldString = yieldOptions;
     const char validYieldOptions[] = {'i', 'd', 'l'}; // initialize array of valid yield options
@@ -69,6 +79,12 @@ void setYieldOption(char* yieldOptions) {
     }
 }
 
+// hash function
+int hash(const char* key) {
+  return (key[0] % numLists);
+}
+
+// generates random keys and place them into elements
 void generateRandomKeys(int totalElements) {
     srand(time(NULL)); // initialize random number generator
 
@@ -84,6 +100,7 @@ void generateRandomKeys(int totalElements) {
     }
 }
 
+// routine that all threads need to perform
 void* listOperations(void* threadIndex) {
     int k;
     int totalElements = numThreads * numIterations;
@@ -183,22 +200,50 @@ void* listOperations(void* threadIndex) {
               fprintf(stderr, "error: failed to delete an element we already inserted\n");
               exit(2);
           }
-	  break;
+	        break;
       }
     }
 
     return NULL;
 }
 
+// function that initializes the global array of sublists
+void initializeLists() {
+    listArray = malloc(numLists * sizeof(SortedList_t));
+    int k;
+    for (k = 0; k < numLists; k++) {
+        listArray[k].key = NULL;
+        listArray[k].next = &listArray[k];
+        listArray[k].prev = &listArray[k];
+    }
+}
+
+// function that initializes locks for the sublists
+void initializeLocks() {
+    if (syncOption == 'm') {
+      mutexArray = malloc(numLists * sizeof(pthread_mutex));
+      int k;
+      for (k = 0; k < numLists; k++)
+        pthread_mutext_init(&mutexArray[k], NULL)
+    }
+    else if (syncOption == 's') {
+      spinArray = malloc(numLists * sizeof(int));
+      int k;
+      for (k = 0; k < numLists; k++)
+        spinArray[k] = 0;
+    }
+}
+
 int main(int argc, char **argv) {
     int option = 0; // used to hold option
 
-    //arguments this program supports
+    // arguments this program supports
     static struct option options[] = {
         {"threads", required_argument, 0, 't'},
         {"iterations", required_argument, 0, 'i'},
         {"yield", required_argument, 0, 'y'},
-        {"sync", required_argument, 0, 's'}
+        {"sync", required_argument, 0, 's'},
+        {"lists", required_argument, 0, 'l'}
     };
 
     // iterate through options
@@ -213,6 +258,9 @@ int main(int argc, char **argv) {
             case 'y':
                 setYieldOption(optarg);
                 break;
+            case 'l':
+                numLists = atoi(optarg);
+                break;
             case 's':
                 if ((optarg[0] == 'm' || optarg[0] == 's') && strlen(optarg) == 1)
                     syncOption = optarg[0];
@@ -220,7 +268,7 @@ int main(int argc, char **argv) {
                     fprintf(stderr, "error: unrecognized sync argument. recognized arguments: [ms]\n");
                     exit(1);
                 }
-		break;
+		            break;
             default:
                 fprintf(stderr, "error: unrecognized argument\nreocgnized arguments:\n--threads=#\n--iterations=#\n--yield=[idl]\n--sync=[ms]\n");
                 exit(1);
@@ -230,19 +278,20 @@ int main(int argc, char **argv) {
     // handler for segmentation faults
     signal(SIGSEGV, segFaultHandler);
 
-    // initialize mutex if needed
-    if (syncOption == 'm') { pthread_mutex_init(&mutex, NULL); }
-
-    // initialize empty list with a head node
-    list = malloc(sizeof(SortedList_t));
-    list->key = NULL;
-    list->next = list;
-    list->prev = list;
+    // initialize sublists and their locks
+    initializeLists();
+    initializeLocks();
 
     // create required number of list elements with random keys
     int totalElements = numThreads * numIterations;
     elementList = malloc(totalElements * sizeof(SortedListElement_t));
     generateRandomKeys(totalElements);
+
+    // calculate which lists each element should go into using hash function
+    listNumber* = malloc(numLists * sizeof(int));
+    int m;
+    for (m = 0; m < totalElements; m++)
+      listNumber[m] = hash(elementList[m].key)
 
     // creates the number of specified threads
     pthread_t *threads = malloc(numThreads * sizeof(pthread_t));
@@ -255,7 +304,7 @@ int main(int argc, char **argv) {
     // runs the threads
     int k;
     for (k = 0; k < numThreads; k++) {
-	threadIds[k] = k;
+        threadIds[k] = k;
         if (pthread_create(threads + k, NULL, listOperations, &threadIds[k])) {
             fprintf(stderr, "error: error in thread creation\n");
             exit(1);
@@ -274,19 +323,24 @@ int main(int argc, char **argv) {
     struct timespec end;
     if (clock_gettime(CLOCK_MONOTONIC, &end) == -1) { fprintf(stderr, "error: error in getting stop time\n"); exit(1); }
 
+    free(listArray);
+    free(mutexArray);
     free(elementList);
     free(threads);
 
+    // format and print test output
     long totalTime = BILL * (end.tv_sec - start.tv_sec) + (end.tv_nsec - start.tv_nsec); // calculate total time elapsed
     int numOperations = numThreads * numIterations * 3; // total operatinos performed
     long costPerOperation = totalTime / numOperations; // average cost per operation
     long averageLockWaitTime = lockWaitTime / numOperations; // average wait-for-lock
-
-    // print test output
     char* testTag = getTestTag();
-    printf("list%s,%d,%d,1,%d,%d,%d,%d\n", testTag, numThreads, numIterations, numOperations, totalTime, costPerOperation,averageLockWaitTime);
+    printf("list%s,%d,%d,%d,%d,%d,%d,%d\n", testTag, numThreads, numIterations, numLists, numOperations, totalTime, costPerOperation,averageLockWaitTime);
 
-    int listLength = SortedList_length(list);
+    // check length of all sublists
+    int listLength;
+    int i;
+    for (i = 0; i < numLists; i++) { listLength += SortedList_length(&listArray[i]) }
     if (listLength != 0) { exit(2); } // exit 2 if list length is not 0
+
     exit(0);
 }
