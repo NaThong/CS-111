@@ -115,16 +115,16 @@ void* listOperations(void* threadIndex) {
     		      pthread_mutex_lock(&mutexArray[listNumber[k]]);
         		  if (clock_gettime(CLOCK_MONOTONIC, &lockWaitEnd) == -1) { fprintf(stderr, "error: error in getting stop time\n"); exit(1); }
         		  lockWaitTime += BILL * (lockWaitEnd.tv_sec - lockWaitStart.tv_sec) + (lockWaitEnd.tv_nsec - lockWaitEnd.tv_nsec);
-          		SortedList_insert(listArray[listNumber[k]], &elementList[k]);
+          		SortedList_insert(&listArray[listNumber[k]], &elementList[k]);
           		pthread_mutex_unlock(&mutexArray[listNumber[k]]);
           		break;
     	    case 's':
           		while(__sync_lock_test_and_set(&spinArray[listNumber[k]], 1));
-          		SortedList_insert(list[listNumber[k]], &elementList[k]);
+          		SortedList_insert(&listArray[listNumber[k]], &elementList[k]);
           		__sync_lock_release(&spinArray[listNumber[k]]);
           		break;
     	    default:
-          		SortedList_insert(list, &elementList[k]);
+          		SortedList_insert(&listArray[listNumber[k]], &elementList[k]);
           		break;
     	}
     }
@@ -138,7 +138,7 @@ void* listOperations(void* threadIndex) {
       	    pthread_mutex_lock(&mutexArray[k]);
       	    if (clock_gettime(CLOCK_MONOTONIC, &lockWaitEnd) == -1) { fprintf(stderr, "error: error in getting stop time\n"); exit(1); }
             lockWaitTime += BILL * (lockWaitEnd.tv_sec - lockWaitStart.tv_sec) + (lockWaitEnd.tv_nsec - lockWaitEnd.tv_nsec);
-            int tempLength = SortedList_length(listArray[k])
+            int tempLength = SortedList_length(&listArray[k]);
       	    if (tempLength == -1) {
               	fprintf(stderr, "error: failed to get length of list\n");
               	exit(2);
@@ -151,7 +151,7 @@ void* listOperations(void* threadIndex) {
     	case 's':
           for (k = 0; k < numLists; k++) {
       	    while (__sync_lock_test_and_set(&spinArray[k], 1));
-            int tempLength = SortedList_length(listArray[k]);
+            int tempLength = SortedList_length(&listArray[k]);
       	    if (tempLength == -1) {
           		fprintf(stderr, "error: failed to get length of list\n");
           		exit(2);
@@ -163,7 +163,7 @@ void* listOperations(void* threadIndex) {
     	    break;
     	default:
           for (k = 0; k < numLists; k++) {
-            int tempLength = SortedList_length(listArray[k]);
+            int tempLength = SortedList_length(&listArray[k]);
       	    if (tempLength == -1) {
           		fprintf(stderr, "error: failed to get length of list\n");
           		exit(2);
@@ -183,7 +183,7 @@ void* listOperations(void* threadIndex) {
           pthread_mutex_lock(&mutexArray[listNumber[k]]);
           if (clock_gettime(CLOCK_MONOTONIC, &lockWaitEnd) == -1) { fprintf(stderr, "error: error in getting stop time\n"); exit(1); }
           lockWaitTime += BILL * (lockWaitEnd.tv_sec - lockWaitStart.tv_sec) + (lockWaitEnd.tv_nsec - lockWaitEnd.tv_nsec);
-          temp = SortedList_lookup(listArray[listNumber[k]], elementList[k].key);
+          temp = SortedList_lookup(&listArray[listNumber[k]], elementList[k].key);
           if (temp == NULL) {
               fprintf(stderr, "error: failed to find element we already inserted\n");
               exit(2);
@@ -196,7 +196,7 @@ void* listOperations(void* threadIndex) {
           break;
         case 's':
           while (__sync_lock_test_and_set(&spinArray[listNumber[k]], 1));
-          temp = SortedList_lookup(listArray[listNumber[k]], elementList[k].key);
+          temp = SortedList_lookup(&listArray[listNumber[k]], elementList[k].key);
           if (temp == NULL) {
               fprintf(stderr, "error: failed to find element we already inserted\n");
               exit(2);
@@ -208,7 +208,7 @@ void* listOperations(void* threadIndex) {
           __sync_lock_release(&spinArray[listNumber[k]]);
           break;
         default:
-          temp = SortedList_lookup(listArray[listNumber[k]], elementList[k].key);
+          temp = SortedList_lookup(&listArray[listNumber[k]], elementList[k].key);
           if (temp == NULL) {
               fprintf(stderr, "error: failed to find element we already inserted\n");
               exit(2);
