@@ -22,7 +22,7 @@
 #	Managing data is simplified by keeping all of the results in a single
 #	file.  But this means that the individual graphing commands have to
 #	grep to select only the data they want.
-#
+
 
 # general plot parameters
 set terminal png
@@ -36,34 +36,26 @@ set ylabel "Throughput (operations / sec)"
 set logscale y 10
 set output 'lab2b_1.png'
 
-# grep out only single threaded, un-protected, non-yield results
 plot \
      "< grep 'list-none-m' lab2_list.csv" using ($2):(1000000000/($7)) \
 	title 'Mutex' with linespoints lc rgb 'red', \
      "< grep 'list-none-s' lab2_list.csv" using ($2):(1000000000/($7)) \
 	title 'Spin-Lock' with linespoints lc rgb 'green'
 
+# PLOT 2: Mean time per mutex wait and mean time per operation
+set title "List-2: Per-operation Times for Mutex Protected List Operations"
+set xlabel "# Threads"
+set xrange [0:30]
+set ylabel "Average Time Per Operations (ns)"
+set logscale y 10
+set output 'lab2b-2.png'
 
-# set title "List-2: Unprotected Threads and Iterations that run without failure"
-# set xlabel "Threads"
-# set logscale x 2
-# set xrange [0.75:]
-# set ylabel "Successful Iterations"
-# set logscale y 10
-# set output 'lab2_list-2.png'
-# # note that unsuccessful runs should have produced no output
-# plot \
-#      "< grep list-none-none lab2_list.csv" using ($2):($3) \
-# 	title 'w/o yields' with points lc rgb 'green', \
-#      "< grep list-i-none lab2_list.csv" using ($2):($3) \
-# 	title 'yield=i' with points lc rgb 'red', \
-#      "< grep list-d-none lab2_list.csv" using ($2):($3) \
-# 	title 'yield=d' with points lc rgb 'violet', \
-#      "< grep list-il-none lab2_list.csv" using ($2):($3) \
-# 	title 'yield=il' with points lc rgb 'orange', \
-#      "< grep list-dl-none lab2_list.csv" using ($2):($3) \
-# 	title 'yield=dl' with points lc rgb 'blue'
-#
+plot \
+     "< grep list-none-m lab2_list.csv" using ($2):($8) \
+	title 'Mutex Wait' with points lc rgb 'green', \
+     "< grep list-none-m lab2_list.csv" using ($2):($7) \
+	title 'Completion Time' with points lc rgb 'red'
+
 # set title "List-3: Protected Iterations that run without failure"
 # unset logscale x
 # set xrange [0:5]
