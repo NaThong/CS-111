@@ -221,10 +221,10 @@ void initializeLists() {
 // function that initializes locks for the sublists
 void initializeLocks() {
     if (syncOption == 'm') {
-      mutexArray = malloc(numLists * sizeof(pthread_mutex));
+      mutexArray = malloc(numLists * sizeof(pthread_mutex_t));
       int k;
       for (k = 0; k < numLists; k++)
-        pthread_mutext_init(&mutexArray[k], NULL)
+        pthread_mutex_init(&mutexArray[k], NULL);
     }
     else if (syncOption == 's') {
       spinArray = malloc(numLists * sizeof(int));
@@ -288,10 +288,10 @@ int main(int argc, char **argv) {
     generateRandomKeys(totalElements);
 
     // calculate which lists each element should go into using hash function
-    listNumber* = malloc(numLists * sizeof(int));
+    listNumber = malloc(numLists * sizeof(int));
     int m;
     for (m = 0; m < totalElements; m++)
-      listNumber[m] = hash(elementList[m].key)
+      listNumber[m] = hash(elementList[m].key);
 
     // creates the number of specified threads
     pthread_t *threads = malloc(numThreads * sizeof(pthread_t));
@@ -339,7 +339,7 @@ int main(int argc, char **argv) {
     // check length of all sublists
     int listLength;
     int i;
-    for (i = 0; i < numLists; i++) { listLength += SortedList_length(&listArray[i]) }
+    for (i = 0; i < numLists; i++) { listLength += SortedList_length(&listArray[i]); }
     if (listLength != 0) { exit(2); } // exit 2 if list length is not 0
 
     exit(0);
