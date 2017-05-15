@@ -171,6 +171,7 @@ void* listOperations(void* threadIndex) {
               fprintf(stderr, "error: failed to delete an element we already inserted\n");
               exit(2);
           }
+	  break;
       }
     }
 
