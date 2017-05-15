@@ -43,7 +43,7 @@ plot \
 	title 'Spin-Lock' with linespoints lc rgb 'green'
 
 # PLOT 2: Mean time per mutex wait and mean time per operation
-set title "List-2: Per-operation Times for Mutex Protected List Operations"
+set title "Plot 2: Per-operation Times for Mutex Protected List Operations"
 set xlabel "# Threads"
 set xrange [0:30]
 set ylabel "Average Time Per Operations (ns)"
@@ -52,9 +52,9 @@ set output 'lab2b-2.png'
 
 plot \
      "< grep list-none-m lab2_list.csv" using ($2):($8) \
-	title 'Mutex Wait' with points lc rgb 'green', \
+	title 'Mutex Wait' with linespoints lc rgb 'green', \
      "< grep list-none-m lab2_list.csv" using ($2):($7) \
-	title 'Completion Time' with points lc rgb 'red'
+	title 'Completion Time' with linespoints lc rgb 'red'
 
 # set title "List-3: Protected Iterations that run without failure"
 # unset logscale x
