@@ -45,7 +45,7 @@ plot \
 # PLOT 2: Mean time per mutex wait and mean time per operation
 set title "Plot 2: Per-operation Times for Mutex Protected List Operations"
 set xlabel "# Threads"
-set xrange [0:4]
+set xrange [0:30]
 set ylabel "Average Time Per Operations (ns)"
 set logscale y 10
 set output 'lab2b_2.png'
@@ -59,7 +59,7 @@ plot \
 # PLOT 3: Successful Iterations when Partitioned Sublists
 set title "Plot 3: Synchronization with Partitioned Sublists"
 set xlabel "Yields"
-set xrange [0:30]
+set xrange [0:4]
 set ylabel "Successful Iterations"
 set logscale y 10
 set output 'lab2b_3.png'
