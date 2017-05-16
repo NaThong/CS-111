@@ -37,9 +37,9 @@ set logscale y 10
 set output 'lab2b_1.png'
 
 plot \
-     "< grep 'list-none-m' lab2_list.csv" using ($2):(1000000000/($7)) \
+     "< grep 'list-none-m,.,1000,1' lab2_list.csv" using ($2):(1000000000/($7)) \
 	title 'Mutex' with linespoints lc rgb 'red', \
-     "< grep 'list-none-s' lab2_list.csv" using ($2):(1000000000/($7)) \
+     "< grep 'list-none-s,.,1000,1' lab2_list.csv" using ($2):(1000000000/($7)) \
 	title 'Spin-Lock' with linespoints lc rgb 'green'
 
 # PLOT 2: Mean time per mutex wait and mean time per operation
@@ -51,9 +51,9 @@ set logscale y 10
 set output 'lab2b_2.png'
 
 plot \
-     "< grep list-none-m lab2_list.csv" using ($2):($8) \
+     "< grep 'list-none-m,.,1000,1' lab2_list.csv" using ($2):($8) \
 	title 'Mutex Wait' with linespoints lc rgb 'green', \
-     "< grep list-none-m lab2_list.csv" using ($2):($7) \
+     "< grep 'list-none-m,.,1000,1' lab2_list.csv" using ($2):($7) \
 	title 'Completion Time' with linespoints lc rgb 'red'
 
 # PLOT 3: Successful Iterations when Partitioned Sublists
