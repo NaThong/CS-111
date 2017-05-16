@@ -18,6 +18,11 @@ because using mutexes means the system has to put threads to sleep until they
 can obtain the lock. System calls are expensive and slow the program down.
 
 2.3.2 - Execution Profiling
+The line of code that is consuming the most cycles is the line of code that
+attempts to obtain the spin lock. This operations becomes extremely expensive
+with a large number of threads, because of increasing contention. Since
+only one thread can hold the lock at any time, the other threads waste their
+CPU cycles just spinning, and wastes time.
 
 2.3.3. - Mutex Wait Time
 The lock-wait time rises dramtically as the number of contending threads
