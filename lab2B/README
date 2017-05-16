@@ -52,3 +52,27 @@ that they all seem to follow this trend.
 
 Included Files:
 
+SortedList.h: SortedList header file that contains the definition and methods
+of a sorted, doubly-linked list.
+
+SortedList.c: Source file that includes the implementation of the methods of a
+sorted doubly-linked list.
+
+lab2_list.c: C program that supports the required options, including the new
+--lists option. The program does the specified tasks of inserting into a list,
+getting the length of a list, and lookup and deletes previously inserted
+elements.
+
+Makefile: Makefile that includes the necessary targets, including build,
+clean, dist, profile, tests, and graphs.
+
+lab2b_list.csv: csv file that contains all the test data generated from
+the test cases.
+
+profile.out: execution profiling report showing where time was spent in the
+unpartitioned spin-lock implementation
+
+lab2b_[1-5].png: All the plots required in the specifications.
+
+lab2_list.gp: script used for gnuplot that creates all the required plots
+and is included in the graphs target of the Makefile
