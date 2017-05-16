@@ -64,11 +64,11 @@ set ylabel "Successful Iterations"
 set logscale y 10
 set output 'lab2b_3.png'
 plot \
-   "< grep 'list-id-none' lab2_list.csv" using ($2):($3) \
+   "< grep 'list-id-none' lab2_list.csv" using (1):($3) \
 	with points lc rgb "red" title "No Synchronization", \
-   "< grep 'list-id-s' lab2_list.csv" using ($2):($3) \
+   "< grep 'list-id-s' lab2_list.csv" using (2):($3) \
 	with points lc rgb "green" title "Mutex", \
-   "< grep 'list-id-m' lab2_list.csv" using ($2):($3) \
+   "< grep 'list-id-m' lab2_list.csv" using (3):($3) \
 	with points lc rgb "blue" title "Spin", \
 
  # "no valid points" is possible if even a single iteration can't run
