@@ -87,11 +87,11 @@ plot \
      "< grep -e 'list-none-m,[0-9]*,1000,1,' lab2_list.csv" using ($2):($7) \
 	title '--lists=1' with linespoints lc rgb 'blue', \
      "< grep -e 'list-none-m,[0-9]*,1000,4,' lab2_list.csv" using ($2):($7) \
-	title '--lists=4' with linespoints lc rgb 'green'
+	title '--lists=4' with linespoints lc rgb 'green', \
     "< grep -e 'list-none-m,[0-9]*,1000,8,' lab2_list.csv" using ($2):($7) \
-  title '--lists=8' with linespoints lc rgb 'orange', \
+	title '--lists=8' with linespoints lc rgb 'orange', \
     "< grep -e 'list-none-m,[0-9]*,1000,16,' lab2_list.csv" using ($2):($7) \
-  title '--lists=16' with linespoints lc rgb 'red'
+	title '--lists=16' with linespoints lc rgb 'red'
 
 # PLOT 5: Throughput of Spin Locks vs. Threads
 set title "Plot 4: Aggregated Throughput of Spin Locks vs. Threads"
@@ -105,8 +105,8 @@ plot \
      "< grep -e 'list-none-s,[0-9]*,1000,1,' lab2_list.csv" using ($2):($7) \
 	title '--lists=1' with linespoints lc rgb 'blue', \
      "< grep -e 'list-none-s,[0-9]*,1000,4,' lab2_list.csv" using ($2):($7) \
-	title '--lists=4' with linespoints lc rgb 'green'
+	title '--lists=4' with linespoints lc rgb 'green', \
     "< grep -e 'list-none-s,[0-9]*,1000,8,' lab2_list.csv" using ($2):($7) \
-  title '--lists=8' with linespoints lc rgb 'orange', \
+	title '--lists=8' with linespoints lc rgb 'orange', \
     "< grep -e 'list-none-s,[0-9]*,1000,16,' lab2_list.csv" using ($2):($7) \
-  title '--lists=16' with linespoints lc rgb 'red'
+	title '--lists=16' with linespoints lc rgb 'red'
