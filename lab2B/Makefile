@@ -2,7 +2,7 @@
 # EMAIL: jeffschan97@gmail.com
 # ID: 004-611-638
 
-#.SILENT:
+.SILENT:
 
 default: build
 
@@ -96,4 +96,6 @@ clean:
 	lab2b_3.png lab2b_4.png lab2b_5.png
 
 dist:
-	tar -czf lab2b-004611638.tar.gz Makefile README
+	tar -czf lab2b-004611638.tar.gz Makefile README SortedList.h \
+	SortedList.c lab2_list.c lab2_list.csv profile.out lab2b_1.png \
+	lab2b_2.png lab2b_3.png lab2b_4.png lab2b_5.png lab2_list.gp

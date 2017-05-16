@@ -4,5 +4,41 @@ ID: 004-611-638
 
 Question Answers:
 
+2.3.1 - Cycles in the basic list implementation
+During the 1 and 2 thread lists tests, most of the cycles are spent within
+the critical sections of the list operations.
+These can be considered the most expensive parts of the code because they
+only allow one thread to execute these sections at a time, thus making
+the program slower because multiple threads can't be used to speed it up.
+Within the spin lock tests, most of the time/cycles are spent spinning
+and waiting for the spin condition allows a thread to obtain the lock. Thus,
+many CPU cycles are wasted spinning and waiting for the lock.
+With the high-thread mutex tests, most of the time is spent using system calls
+because using mutexes means the system has to put threads to sleep until they
+can obtain the lock. System calls are expensive and slow the program down.
+
+2.3.2 - Execution Profiling
+
+2.3.3. - Mutex Wait Time
+The lock-wait time rises dramtically as the number of contending threads
+increases because because more threads cause more contention for the mutex.
+Also, there are many threads, but only one thread can enter the critical
+section at at time, so time is wasted waiting for the lock to be released
+by another thread.
+Overall completion time rises less dramatically beacuse although threads,
+spend more tiem waiting for the lock, there is always at least one thread
+that's making progress at a time, so completion time isn't affected by lock
+wait time.
+It's possible for the wait time per operation to go up faster and higher
+than the completion time per operation because each thread has its own clock
+when waiting for the lock, and since multiple threads can be waiting at the
+same time, the time that the thread's clock measure overlaps. The overlapped
+time is then added into a total, and thus the result is perceived to grow
+dramatically. The time per operation timing only relies on a single clock and
+we don't have to worry about any overlapping time.
+
+2.3.4 - Performance of Partitioned Lists
+
+
 Included Files:
 
