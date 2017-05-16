@@ -51,9 +51,9 @@ set logscale y 10
 set output 'lab2b_2.png'
 
 plot \
-     "< grep 'list-none-m,[0-9]*,1000,1' lab2_list.csv" using ($2):($8) \
+     "< grep 'list-none-m,[0-9]*,1000,1,' lab2_list.csv" using ($2):($8) \
 	title 'Mutex Wait' with linespoints lc rgb 'green', \
-     "< grep 'list-none-m,[0-9]*,1000,1' lab2_list.csv" using ($2):($7) \
+     "< grep 'list-none-m,[0-9]*,1000,1,' lab2_list.csv" using ($2):($7) \
 	title 'Completion Time' with linespoints lc rgb 'red'
 
 # PLOT 3: Successful Iterations when Partitioned Sublists
