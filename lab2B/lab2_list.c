@@ -118,7 +118,10 @@ void* listOperations(void* threadIndex) {
           		pthread_mutex_unlock(&mutexArray[listNumber[k]]);
           		break;
     	    case 's':
+              if (clock_gettime(CLOCK_MONOTONIC, &lockWaitStart) == -1) { fprintf(stderr, "error: error in getting start time\n"); exit(1); }
           		while(__sync_lock_test_and_set(&spinArray[listNumber[k]], 1));
+              if (clock_gettime(CLOCK_MONOTONIC, &lockWaitEnd) == -1) { fprintf(stderr, "error: error in getting stop time\n"); exit(1); }
+        		  lockWaitTime += BILL * (lockWaitEnd.tv_sec - lockWaitStart.tv_sec) + (lockWaitEnd.tv_nsec - lockWaitStart.tv_nsec);
           		SortedList_insert(&listArray[listNumber[k]], &elementList[k]);
           		__sync_lock_release(&spinArray[listNumber[k]]);
           		break;
@@ -149,7 +152,10 @@ void* listOperations(void* threadIndex) {
     	    break;
     	case 's':
           for (k = 0; k < numLists; k++) {
+            if (clock_gettime(CLOCK_MONOTONIC, &lockWaitStart) == -1) { fprintf(stderr, "error: error in getting start time\n"); exit(1); }
       	    while (__sync_lock_test_and_set(&spinArray[k], 1));
+            if (clock_gettime(CLOCK_MONOTONIC, &lockWaitEnd) == -1) { fprintf(stderr, "error: error in getting stop time\n"); exit(1); }
+            lockWaitTime += BILL * (lockWaitEnd.tv_sec - lockWaitStart.tv_sec) + (lockWaitEnd.tv_nsec - lockWaitStart.tv_nsec);
             int tempLength = SortedList_length(&listArray[k]);
       	    if (tempLength == -1) {
           		fprintf(stderr, "error: failed to get length of list\n");
@@ -194,7 +200,10 @@ void* listOperations(void* threadIndex) {
           pthread_mutex_unlock(&mutexArray[listNumber[k]]);
           break;
         case 's':
+          if (clock_gettime(CLOCK_MONOTONIC, &lockWaitStart) == -1) { fprintf(stderr, "error: error in getting start time\n"); exit(1); }
           while (__sync_lock_test_and_set(&spinArray[listNumber[k]], 1));
+          if (clock_gettime(CLOCK_MONOTONIC, &lockWaitEnd) == -1) { fprintf(stderr, "error: error in getting stop time\n"); exit(1); }
+          lockWaitTime += BILL * (lockWaitEnd.tv_sec - lockWaitStart.tv_sec) + (lockWaitEnd.tv_nsec - lockWaitStart.tv_nsec);
           temp = SortedList_lookup(&listArray[listNumber[k]], elementList[k].key);
           if (temp == NULL) {
               fprintf(stderr, "error: failed to find element we already inserted\n");
