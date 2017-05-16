@@ -38,7 +38,17 @@ dramatically. The time per operation timing only relies on a single clock and
 we don't have to worry about any overlapping time.
 
 2.3.4 - Performance of Partitioned Lists
+The throughput of the synchronized methods increases as the number of lists
+increases.
+The throughput will increase the as the number of lists keeps increasing, but
+it will eventually hit a limit. Eventually the number of lists will be
+equivalent to the number of threads, which means that each thread would have
+its own sublist to operate on, and there would be no more memory contention.
+It might also operate as if there was only one thread one single list.
 
+It does seem true that an N-way partitioned list is equivalent to a single
+list with 1/N threads. Looking at my own plots, From my own plots, I can see
+that they all seem to follow this trend.
 
 Included Files:
 
