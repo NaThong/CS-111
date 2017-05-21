@@ -97,8 +97,11 @@ int main(int argc, char **argv) {
 
 		// print to stdout and log file
 		fprintf(stdout, "%s %.1f\n", timeString, processedTemperature);
+		if (logFile) {
+			fprintf(logFD, "%s %.1f\n", timeString, processedTemperature);
+		}
 
-		sleep(1 / period);
+		sleep(period);
 	}
 
 	exit(0);
