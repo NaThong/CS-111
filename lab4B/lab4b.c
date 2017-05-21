@@ -31,7 +31,7 @@ double getTemperature(int rawTemperature, char scale) {
 	return celsius * 9/5 + 32; // farenheit
 }
 
-void handleShutdown(timeString, logFile) {
+void handleShutdown(char *timeString, FILE *logFile) {
 	fprintf(stdout, "%s SHUTDOWN\n", timeString);
 	if (logFile) {
 		fprintf(logFile, "%s SHUTDOWN\n", timeString);
