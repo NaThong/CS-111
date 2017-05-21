@@ -39,7 +39,7 @@ void handleShutdown(FILE *logFile) {
 	// get current time
 	time(&localTimer);
 	localTimeInfo = localtime(&timer);
-	strftime(timeString, 10, "%H:%M:%S", timeInfo);
+	strftime(timeString, 10, "%H:%M:%S", localTimeInfo);
 
 	// print log and exit
 	fprintf(stdout, "%s SHUTDOWN\n", timeString);
