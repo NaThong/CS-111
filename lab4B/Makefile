@@ -11,7 +11,7 @@ check:
 	echo "check target"
 
 clean:
-	rm -f lab4b
+	rm -f lab4b *.txt
 
 dist:
 	tar -czf lab4b-004611638.tar.gz Makefile README

@@ -68,15 +68,6 @@ int main(int argc, char **argv) {
 	mraa_aio_context temperatureSensor;
 	temperatureSensor = mraa_aio_init(0);
 
-	// get log file descriptor
-	// if (logFile) {
-	// 	logFD = creat(logFile, 0666);
-	// 	if (logFD < 0) {
-	// 		fprintf(stderr, "error: unable to open log file");
-	// 		exit(0);
-	// 	}
-	// }
-
 	// to hold raw temperature read by temperature sensor
 	int rawTemperature = 0;
 
@@ -97,7 +88,7 @@ int main(int argc, char **argv) {
 
 		// print to stdout and log file
 		fprintf(stdout, "%s %.1f\n", timeString, processedTemperature);
-		if (logFile) {
+		if (logFile != NULL) {
 			fprintf(logFile, "%s %.1f\n", timeString, processedTemperature);
 		}
 
