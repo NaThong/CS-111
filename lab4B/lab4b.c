@@ -91,6 +91,8 @@ int main(int argc, char **argv) {
 			fprintf(logFile, "%s %.1f\n", timeString, processedTemperature);
 		}
 
+		fflush(logFile); // flush out buffer to make sure log file is written
+
 		sleep(period);
 	}
 
