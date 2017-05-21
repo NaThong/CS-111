@@ -66,6 +66,9 @@ int main(int argc, char **argv) {
 	// initialize temperature sensor at A0
 	mraa_aio_context temperatureSensor;
 	temperatureSensor = mraa_aio_init(0);
+	mraa_gpio_context button;
+	button = mraa_gpio_init(3);
+	mraa_gpio_dir(button, MRAA_GPIO_IN);
 
 	// to hold raw temperature read by temperature sensor
 	int rawTemperature = 0;
@@ -85,9 +88,17 @@ int main(int argc, char **argv) {
 		timeInfo = localtime(&timer);
 		strftime(timeString, 10, "%H:%M:%S", timeInfo);
 
+		// read from button and shutdown if needed
+		if (mraa_gpio_read(button)) {
+			fprintf(stdout, "%s SHUTDOWN\n", timeString);
+			if (logFile) {
+				fprintf(logFile, "%s SHUTDOWN\n", timeString);
+			}
+		}
+
 		// print to stdout and log file
 		fprintf(stdout, "%s %.1f\n", timeString, processedTemperature);
-		if (logFile != NULL) {
+		if (logFile) {
 			fprintf(logFile, "%s %.1f\n", timeString, processedTemperature);
 		}
 
