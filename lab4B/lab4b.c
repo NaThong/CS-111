@@ -7,6 +7,7 @@
 #include<unistd.h>
 #include<getopt.h>
 #include<string.h>
+#include<mraa.h>
 #include<mraa/aio.h>
 
 // GLOBAL VARIABLES

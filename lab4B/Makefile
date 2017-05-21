@@ -5,7 +5,7 @@
 .SILENT:
 
 default:
-	gcc lab4b.c -o lab4b
+	gcc -lmraa lab4b.c -o lab4b
 
 check:
 	echo "check target"
