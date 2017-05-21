@@ -4,8 +4,10 @@
 
 #include<stdio.h>
 #include<stdlib.h>
+#include<unistd.h>
 #include<getopt.h>
 #include<string.h>
+#include<mraa/aio.h>
 
 // GLOBAL VARIABLES
 int period = 0;
@@ -42,6 +44,13 @@ int main(int argc, char **argv) {
 				exit(1);
 		}
 	}
+
+	// initialize temperature sensor at A0
+	mraa_aio_context temperatureSensor;
+	temperatureSensor = mraa_aio_init(0);
+
+	// to hold raw temperature read by temperature sensor
+	int rawTemperature = 0;
 
 	exit(0);
 }
