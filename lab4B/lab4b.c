@@ -29,7 +29,7 @@ double getTemperature(int rawTemperature, char scale) {
 	double celsius = 1.0 / (log(temp/100000.0) / B + 1/298.15) - 273.15;
 
 	if (scale == 'C')
-		return celsius
+		return celsius;
 	return celsius * 9/5 + 32; // farenheit
 }
 
@@ -92,11 +92,11 @@ int main(int argc, char **argv) {
 
 		// get current time
 		time(&timer);
-		timeInfo = localTime(&timer);
-		strftime(timeBuffer, 10, "%H:%M:%S", timeInfo);
+		timeInfo = localtime(&timer);
+		strftime(timeString, 10, "%H:%M:%S", timeInfo);
 
 		// print to stdout and log file
-		fprintf(stdout, "%s %.1f\n", timeBuffer, processedTemperature);
+		fprintf(stdout, "%s %.1f\n", timeString, processedTemperature);
 
 		sleep(1 / period);
 	}
