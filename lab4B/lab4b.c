@@ -18,7 +18,7 @@
 
 // GLOBAL VARIABLES
 const int B = 4275; // value of thermistor
-double period = 1;
+int period = 1;
 char scale = 'F';
 
 double getTemperature(int rawTemperature, char scale) {
