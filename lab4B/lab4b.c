@@ -66,6 +66,8 @@ int main(int argc, char **argv) {
 	// initialize temperature sensor at A0
 	mraa_aio_context temperatureSensor;
 	temperatureSensor = mraa_aio_init(0);
+
+	// initialize button at D3
 	mraa_gpio_context button;
 	button = mraa_gpio_init(3);
 	mraa_gpio_dir(button, MRAA_GPIO_IN);
@@ -74,7 +76,7 @@ int main(int argc, char **argv) {
 	int rawTemperature = 0;
 
 	// initialize time variables
-	time_t timer;
+	time_t timer, start, end;
 	char timeString[10];
 	struct tm* timeInfo;
 
@@ -88,24 +90,35 @@ int main(int argc, char **argv) {
 		timeInfo = localtime(&timer);
 		strftime(timeString, 10, "%H:%M:%S", timeInfo);
 
-		// read from button and shutdown if needed
-		if (mraa_gpio_read(button)) {
-			fprintf(stdout, "%s SHUTDOWN\n", timeString);
-			if (logFile) {
-				fprintf(logFile, "%s SHUTDOWN\n", timeString);
-			}
-			exit(0);
-		}
+		// // read from button and shutdown if needed
+		// if (mraa_gpio_read(button)) {
+		// 	fprintf(stdout, "%s SHUTDOWN\n", timeString);
+		// 	if (logFile) {
+		// 		fprintf(logFile, "%s SHUTDOWN\n", timeString);
+		// 	}
+		// 	exit(0);
+		// }
 
 		// print to stdout and log file
 		fprintf(stdout, "%s %.1f\n", timeString, processedTemperature);
 		if (logFile) {
 			fprintf(logFile, "%s %.1f\n", timeString, processedTemperature);
 		}
-
 		fflush(logFile); // flush out buffer to make sure log file is written
 
-		sleep(period);
+		// sleep(period);
+		time(&start); // start the timer
+		time(&end);
+		while (difftime(end, start) < period) {
+			// read from button and shutdown if needed
+			if (mraa_gpio_read(button)) {
+				fprintf(stdout, "%s SHUTDOWN\n", timeString);
+				if (logFile) {
+					fprintf(logFile, "%s SHUTDOWN\n", timeString);
+				}
+				exit(0);
+			}
+		}
 	}
 
 	exit(0);
