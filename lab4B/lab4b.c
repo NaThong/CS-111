@@ -31,11 +31,17 @@ double getTemperature(int rawTemperature, char scale) {
 	return celsius * 9/5 + 32; // farenheit
 }
 
-void handleShutdown(time_t timer, struct tm* timeInfo, char *timeString, FILE *logFile) {
-	time(&timer);
-	timeInfo = localtime(&timer);
+void handleShutdown(FILE *logFile) {
+	time_t localTimer;
+	char timeString[10];
+	struct tm* localTimeInfo;
+
+	// get current time
+	time(&localTimer);
+	localTimeInfo = localtime(&timer);
 	strftime(timeString, 10, "%H:%M:%S", timeInfo);
 
+	// print log and exit
 	fprintf(stdout, "%s SHUTDOWN\n", timeString);
 	if (logFile) {
 		fprintf(logFile, "%s SHUTDOWN\n", timeString);
@@ -114,7 +120,7 @@ int main(int argc, char **argv) {
 		while (difftime(end, start) < period) {
 			// read from button and shutdown if needed
 			if (mraa_gpio_read(button))
-				handleShutdown(timer, timeInfo, timeString, logFile);
+				handleShutdown(logFile);
 
 			time(&end); // sample new ending time
 		}
