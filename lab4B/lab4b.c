@@ -94,6 +94,7 @@ int main(int argc, char **argv) {
 			if (logFile) {
 				fprintf(logFile, "%s SHUTDOWN\n", timeString);
 			}
+			exit(0);
 		}
 
 		// print to stdout and log file
