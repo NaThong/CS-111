@@ -108,7 +108,7 @@ int main(int argc, char **argv) {
 
 		// sleep(period);
 		time(&start); // start the timer
-		time(&end);
+		time(&end);	// sample ending time
 		while (difftime(end, start) < period) {
 			// read from button and shutdown if needed
 			if (mraa_gpio_read(button)) {
@@ -118,6 +118,7 @@ int main(int argc, char **argv) {
 				}
 				exit(0);
 			}
+			time(&end); // sample new ending time
 		}
 	}
 
