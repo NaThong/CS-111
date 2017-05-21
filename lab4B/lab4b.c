@@ -5,16 +5,18 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include<getopt.h>
+#include<string.h>
 
 // GLOBAL VARIABLES
-char *logFile = NULL;
+int period = 0;
 char scale = 'F';
+char *logFile = NULL;
 
 int main(int argc, char **argv) {
 	int option = 0; // used to hold option
 
 	// arguments this program supports
-	static struct options options[] = {
+	static struct option options[] = {
 		{"period", required_argument, 0, 'p'},
 		{"scale", required_argument, 0, 's'},
 		{"log", required_argument, 0, 'l'}
@@ -24,14 +26,19 @@ int main(int argc, char **argv) {
 	while ((option = getopt_long(argc, argv, "p:s:l", options, NULL)) != -1) {
 		switch (option) {
 			case 'p':
-				printf("received period option\n");
-				break;
+				period = atoi(optarg); break;
 			case 's':
-				scale = optarg; break;
+				if (strlen(optarg) == 1 && (optarg[0] == 'C' || optarg[0] == 'F'))
+					scale = optarg[0];
+				else {
+					fprintf(stderr, "error: unrecognized scale argument\n");
+					exit(1);
+				}
+				break;
 			case 'l':
 				logFile = optarg; break;
 			default:
-				fprintf(stderr, "error: unrecognized argument\n")
+				fprintf(stderr, "error: unrecognized argument\n");
 				exit(1);
 		}
 	}
