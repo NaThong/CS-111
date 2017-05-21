@@ -20,7 +20,7 @@
 const int B = 4275; // value of thermistor
 int period = 1;
 char scale = 'F';
-char *logFile = NULL;
+FILE *logFile = NULL;
 int logFD = 0;
 
 double getTemperature(int rawTemperature, char scale) {
@@ -57,7 +57,7 @@ int main(int argc, char **argv) {
 				}
 				break;
 			case 'l':
-				logFile = optarg; break;
+				logFile = fopen(optarg, "w"); break;
 			default:
 				fprintf(stderr, "error: unrecognized argument\n");
 				exit(1);
@@ -98,7 +98,7 @@ int main(int argc, char **argv) {
 		// print to stdout and log file
 		fprintf(stdout, "%s %.1f\n", timeString, processedTemperature);
 		if (logFile) {
-			fprintf(logFD, "%s %.1f\n", timeString, processedTemperature);
+			fprintf(logFile, "%s %.1f\n", timeString, processedTemperature);
 		}
 
 		sleep(period);
