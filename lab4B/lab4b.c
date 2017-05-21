@@ -31,6 +31,14 @@ double getTemperature(int rawTemperature, char scale) {
 	return celsius * 9/5 + 32; // farenheit
 }
 
+void handleShutdown(timeString, logFile) {
+	fprintf(stdout, "%s SHUTDOWN\n", timeString);
+	if (logFile) {
+		fprintf(logFile, "%s SHUTDOWN\n", timeString);
+	}
+	exit(0);
+}
+
 int main(int argc, char **argv) {
 	int option = 0; // used to hold option
 	FILE *logFile = NULL;
@@ -90,15 +98,6 @@ int main(int argc, char **argv) {
 		timeInfo = localtime(&timer);
 		strftime(timeString, 10, "%H:%M:%S", timeInfo);
 
-		// // read from button and shutdown if needed
-		// if (mraa_gpio_read(button)) {
-		// 	fprintf(stdout, "%s SHUTDOWN\n", timeString);
-		// 	if (logFile) {
-		// 		fprintf(logFile, "%s SHUTDOWN\n", timeString);
-		// 	}
-		// 	exit(0);
-		// }
-
 		// print to stdout and log file
 		fprintf(stdout, "%s %.1f\n", timeString, processedTemperature);
 		if (logFile) {
@@ -106,17 +105,17 @@ int main(int argc, char **argv) {
 		}
 		fflush(logFile); // flush out buffer to make sure log file is written
 
-		// sleep(period);
 		time(&start); // start the timer
 		time(&end);	// sample ending time
 		while (difftime(end, start) < period) {
 			// read from button and shutdown if needed
 			if (mraa_gpio_read(button)) {
-				fprintf(stdout, "%s SHUTDOWN\n", timeString);
-				if (logFile) {
-					fprintf(logFile, "%s SHUTDOWN\n", timeString);
-				}
-				exit(0);
+				// fprintf(stdout, "%s SHUTDOWN\n", timeString);
+				// if (logFile) {
+				// 	fprintf(logFile, "%s SHUTDOWN\n", timeString);
+				// }
+				// exit(0);
+				handleShutdown(timeString, logFile);
 			}
 			time(&end); // sample new ending time
 		}
