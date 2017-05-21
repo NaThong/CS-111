@@ -20,8 +20,6 @@
 const int B = 4275; // value of thermistor
 int period = 1;
 char scale = 'F';
-FILE *logFile = NULL;
-int logFD = 0;
 
 double getTemperature(int rawTemperature, char scale) {
 	double temp = 1023.0 / ((double)rawTemperature) - 1.0;
@@ -35,6 +33,7 @@ double getTemperature(int rawTemperature, char scale) {
 
 int main(int argc, char **argv) {
 	int option = 0; // used to hold option
+	FILE *logFile = NULL;
 
 	// arguments this program supports
 	static struct option options[] = {
