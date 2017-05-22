@@ -43,10 +43,17 @@ void handleShutdown(FILE *logFile) {
 	strftime(timeString, 10, "%H:%M:%S", localTimeInfo);
 
 	// print log and exit
-	if (logFile) {
+	if (logFile)
 		fprintf(logFile, "%s SHUTDOWN\n", timeString);
-	}
 	exit(0);
+}
+
+void handleScale(char newScale) {
+	scale = newScale;
+}
+
+void handlePeriod(int newPeriod) {
+	period = newPeriod;
 }
 
 int main(int argc, char **argv) {
