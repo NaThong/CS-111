@@ -177,6 +177,7 @@ int main(int argc, char **argv) {
 				handleCommand(command);
 			}
 			if (start == 1) {
+				fprintf(stdout, "getting time\n");
 				time(&end); // sample new ending time
 			}
 		}
