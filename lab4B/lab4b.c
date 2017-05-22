@@ -175,8 +175,9 @@ int main(int argc, char **argv) {
 				scanf("%s", command);
 				handleCommand(command);
 			}
-			if (start)
+			if (start) {
 				time(&end); // sample new ending time
+			}
 		}
 	}
 
