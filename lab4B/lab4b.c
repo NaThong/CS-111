@@ -43,7 +43,6 @@ void handleShutdown(FILE *logFile) {
 	strftime(timeString, 10, "%H:%M:%S", localTimeInfo);
 
 	// print log and exit
-	fprintf(stdout, "%s SHUTDOWN\n", timeString);
 	if (logFile) {
 		fprintf(logFile, "%s SHUTDOWN\n", timeString);
 	}
@@ -100,8 +99,8 @@ int main(int argc, char **argv) {
 	struct tm* timeInfo;
 
 	// initialize poll structures
-	struct pollfd pollfdArray[2];
-	pollfdArray[0].fd = 0; // polls from stdin
+	struct pollfd pollfdArray[1];
+	pollfdArray[0].fd = STDIN_FILENO; // polls from stdin
 	pollfdArray[0].events = POLLIN | POLLHUP | POLLERR;
 
 	while (1) {
@@ -129,14 +128,14 @@ int main(int argc, char **argv) {
 				handleShutdown(logFile);
 
 			// poll for input
-			int returnValue = poll(pollfdArray, 2, 0);
+			int returnValue = poll(pollfdArray, 1, 0);
 			if (returnValue < 0) {
 				fprintf(stderr, "error: error while polling\n");
 				exit(1);
 			}
 
-			if ((pollfdArray[0].revents & (POLLIN | POLLHUP | POLLERR))) {
-				printf("polling works\n");
+			if ((pollfdArray[0].revents & POLLIN)) {
+				exit(0);
 			}
 
 			time(&end); // sample new ending time
