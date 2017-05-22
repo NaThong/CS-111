@@ -22,6 +22,7 @@ const int B = 4275; // value of thermistor
 int period = 1;
 char scale = 'F';
 FILE *logFile = NULL;
+int start = 1;
 
 double getTemperature(int rawTemperature, char scale) {
 	double temp = 1023.0 / ((double)rawTemperature) - 1.0;
@@ -31,6 +32,11 @@ double getTemperature(int rawTemperature, char scale) {
 	if (scale == 'C')
 		return celsius;
 	return celsius * 9/5 + 32; // farenheit
+}
+
+void printCommand(const char* command) {
+	if (logFile) fprintf(logFile, "%s\n", command);
+	fflush(logFile);
 }
 
 void handleShutdown(FILE *logFile) {
@@ -49,20 +55,35 @@ void handleShutdown(FILE *logFile) {
 	exit(0);
 }
 
-void handleScale(char newScale) {
-	scale = newScale;
+void handleStartStop(const int newValue, const char* command) {
+	start = newValue;
+	printCommand(command);
 }
 
-void handlePeriod(int newPeriod) {
+void handleScale(char newScale, const char* command) {
+	scale = newScale;
+	printCommand(command);
+}
+
+void handlePeriod(int newPeriod, const char* command)) {
 	period = newPeriod;
+}
+
+void handleInvalidCommand() {
+	printCommand("error: invalid command");
+	exit(1);
 }
 
 void handleCommand(const char* command) {
 	if (strcmp(command, "OFF") == 0) {
-		if (logFile) fprintf(logFile, "%s\n", command);
-		fflush(logFile); // flush out buffer to make sure log file is written
+		printCommand("OFF");
 		handleShutdown(logFile);
 	}
+	else if (strcmp(command, "STOP") == 0) handleStartStop(0, command);
+	else if (strcmp(command, "START") == 0) handleStartStop(1, command);
+	else if (strcmp(command, "SCALE=F") == 0) handleScale('F', command);
+	else if (strcmp(command, "SCALE=C") == 0) handleScale('C', command);
+	else handleInvalidCommand();
 }
 
 int main(int argc, char **argv) {
@@ -154,8 +175,8 @@ int main(int argc, char **argv) {
 				scanf("%s", command);
 				handleCommand(command);
 			}
-
-			time(&end); // sample new ending time
+			if (start)
+				time(&end); // sample new ending time
 		}
 	}
 
