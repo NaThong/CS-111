@@ -15,6 +15,7 @@
 #include<sys/types.h>
 #include<sys/stat.h>
 #include<fcntl.h>
+#include<poll.h>
 
 // GLOBAL VARIABLES
 const int B = 4275; // value of thermistor
@@ -98,6 +99,11 @@ int main(int argc, char **argv) {
 	char timeString[10];
 	struct tm* timeInfo;
 
+	// initialize poll structures
+	struct pollfd pollfdArray[1];
+	pollfdArray[0].fd = 0; // polls from stdin
+	pollfdArray[0].events = POLLIN | POLLHUP | POLLERR;
+
 	while (1) {
 		// get temperature
 		rawTemperature = mraa_aio_read(temperatureSensor);
@@ -121,6 +127,17 @@ int main(int argc, char **argv) {
 			// read from button and shutdown if needed
 			if (mraa_gpio_read(button))
 				handleShutdown(logFile);
+
+			// poll for input
+			int returnValue = poll(pollfdArray, 1, 0);
+			if (returnValue < 0)
+				fprintf(stderr, "error: error while polling\n");
+				exit(1);
+			}
+
+			if (pollfdArray[0].revents & POLLIN) {
+				printf("polling works\n");
+			}
 
 			time(&end); // sample new ending time
 		}
