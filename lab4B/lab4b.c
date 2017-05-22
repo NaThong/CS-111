@@ -100,7 +100,7 @@ int main(int argc, char **argv) {
 	struct tm* timeInfo;
 
 	// initialize poll structures
-	struct pollfd pollfdArray[1];
+	struct pollfd pollfdArray[2];
 	pollfdArray[0].fd = 0; // polls from stdin
 	pollfdArray[0].events = POLLIN | POLLHUP | POLLERR;
 
@@ -129,13 +129,12 @@ int main(int argc, char **argv) {
 				handleShutdown(logFile);
 
 			// poll for input
-			int returnValue = poll(pollfdArray, 1, 0);
+			int returnValue = poll(pollfdArray, 2, 0);
 			if (returnValue < 0) {
 				fprintf(stderr, "error: error while polling\n");
 				exit(1);
 			}
 
-			printf("please hello\n");
 			if ((pollfdArray[0].revents & POLLIN)) {
 				printf("polling works\n");
 			}
