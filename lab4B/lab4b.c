@@ -135,7 +135,7 @@ int main(int argc, char **argv) {
 				exit(1);
 			}
 
-			if (pollfdArray[0].revents & POLLIN) {
+			if ((pollfdArray[0].revents & POLLIN)) {
 				printf("polling works\n");
 			}
 
