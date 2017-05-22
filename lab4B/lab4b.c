@@ -142,10 +142,11 @@ int main(int argc, char **argv) {
 			}
 
 			if ((pollfdArray[0].revents & POLLIN)) {
+				FILE* stream;
 				char *line = NULL;
 				size_t length = 0;
-				int nread = getline(&line, &length, STDIN_FILENO);
-				printf("%s", line);
+				int nread = getline(&line, &length, stream);
+				fwrite(line, nread, 1, stdout);
 			}
 
 			time(&end); // sample new ending time
