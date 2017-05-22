@@ -145,6 +145,7 @@ int main(int argc, char **argv) {
 				char command[50];
 				scanf("%s", command);
 				printf("%s", command);
+				fflush(command); // flush out buffer
 			}
 
 			time(&end); // sample new ending time
