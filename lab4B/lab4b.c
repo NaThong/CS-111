@@ -32,10 +32,6 @@ double getTemperature(int rawTemperature, char scale) {
 	return celsius * 9/5 + 32; // farenheit
 }
 
-void handleCommand(const char* command) {
-	if (strcmp(command, 'OFF')) handleShutdown(logFile);
-}
-
 void handleShutdown(FILE *logFile) {
 	time_t localTimer;
 	char timeString[10];
@@ -58,6 +54,10 @@ void handleScale(char newScale) {
 
 void handlePeriod(int newPeriod) {
 	period = newPeriod;
+}
+
+void handleCommand(const char* command) {
+	if (strcmp(command, 'OFF')) handleShutdown(logFile);
 }
 
 int main(int argc, char **argv) {
