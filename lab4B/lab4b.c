@@ -65,7 +65,7 @@ void handleScale(char newScale, const char* command) {
 	printCommand(command);
 }
 
-void handlePeriod(int newPeriod, const char* command)) {
+void handlePeriod(int newPeriod, const char* command) {
 	period = newPeriod;
 }
 
