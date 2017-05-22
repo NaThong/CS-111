@@ -146,7 +146,7 @@ int main(int argc, char **argv) {
 				char *line = NULL;
 				size_t length = 0;
 				int nread = getline(&line, &length, stream);
-				fwrite(line, nread, 1, stdout);
+				// fwrite(line, nread, 1, stdout);
 			}
 
 			time(&end); // sample new ending time
