@@ -58,7 +58,10 @@ void handlePeriod(int newPeriod) {
 }
 
 void handleCommand(const char* command) {
-	if (strcmp(command, "OFF")) handleShutdown(logFile);
+	if (strcmp(command, "OFF")) {
+		printf("handleShutdown");
+		handleShutdown(logFile);
+	}
 }
 
 int main(int argc, char **argv) {
