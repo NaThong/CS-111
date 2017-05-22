@@ -177,10 +177,9 @@ int main(int argc, char **argv) {
 				handleCommand(command);
 			}
 
-			fprintf(stdout, "is it hanging here?\n");
 			if (start == 1) {
 				fprintf(stdout, "getting time\n");
-				time(&end); // sample new ending time
+				// time(&end); // sample new ending time
 			}
 		}
 	}
