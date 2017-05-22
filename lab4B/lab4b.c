@@ -144,7 +144,7 @@ int main(int argc, char **argv) {
 			if ((pollfdArray[0].revents & POLLIN)) {
 				char buffer;
 				int bytesRead = read(STDIN_FILENO, &buffer, sizeof(char));
-				prinf("%c\n", buffer);
+				printf("%c\n", buffer);
 			}
 
 			time(&end); // sample new ending time
