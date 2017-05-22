@@ -58,7 +58,11 @@ void handlePeriod(int newPeriod) {
 }
 
 void handleCommand(const char* command) {
-	if (strcmp(command, "OFF") == 0) handleShutdown(logFile);
+	if (strcmp(command, "OFF") == 0) {
+		if (logFile) fprintf(logFile, "%s\n", command);
+		fflush(logFile); // flush out buffer to make sure log file is written
+		handleShutdown(logFile);
+	}
 }
 
 int main(int argc, char **argv) {
