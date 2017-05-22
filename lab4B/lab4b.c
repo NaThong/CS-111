@@ -130,7 +130,7 @@ int main(int argc, char **argv) {
 
 			// poll for input
 			int returnValue = poll(pollfdArray, 1, 0);
-			if (returnValue < 0)
+			if (returnValue < 0) {
 				fprintf(stderr, "error: error while polling\n");
 				exit(1);
 			}
