@@ -142,7 +142,10 @@ int main(int argc, char **argv) {
 			}
 
 			if ((pollfdArray[0].revents & POLLIN)) {
-				exit(0);
+				char *line = NULL;
+				size_t length = 0;
+				int nread = getline(&line, &length, STDIN_FILENO);
+				printf("%s", line);
 			}
 
 			time(&end); // sample new ending time
