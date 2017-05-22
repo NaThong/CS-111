@@ -32,6 +32,10 @@ double getTemperature(int rawTemperature, char scale) {
 	return celsius * 9/5 + 32; // farenheit
 }
 
+void handleCommand(const char* command) {
+	if (strcmp(command, 'OFF')) handleShutdown(logFile);
+}
+
 void handleShutdown(FILE *logFile) {
 	time_t localTimer;
 	char timeString[10];
@@ -144,8 +148,7 @@ int main(int argc, char **argv) {
 			if ((pollfdArray[0].revents & POLLIN)) {
 				char command[50];
 				scanf("%s", command);
-				printf("%s", command);
-				fflush(command); // flush out buffer
+				handleCommand(command);
 			}
 
 			time(&end); // sample new ending time
