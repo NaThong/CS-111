@@ -196,10 +196,9 @@ if [ $errors -eq 0 ]; then
 	echo "SUBMISSION $tarball ... passes sanity check"
 	echo
 	echo
-	cleanup 0
 else
 	echo "SUBMISSION $tarball ... fails sanity check with $errors errors!"
 	echo
 	echo
-	cleanup -1
 fi
+rm -f LOGFILE STDERR
