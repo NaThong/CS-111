@@ -201,4 +201,4 @@ else
 	echo
 	echo
 fi
-rm -f LOGFILE STDERR
+rm -f LOGFILE STDERR lab4b
