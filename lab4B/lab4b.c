@@ -96,8 +96,12 @@ void handleCommand(const char* command) {
 				match = 0;
 			k++;
 		}
-		if (!match) handleInvalidCommand(command);
+		if (!match) {
+			printf("match: %d\n", match);
+			handleInvalidCommand(command);
+		}
 		while (command[k] != '\0') {
+			printf("HELLO: %d\n", atoi(&command[k]));
 			if (!isdigit(atoi(&command[k]))) handleInvalidCommand(command);
 			k++;
 		}
