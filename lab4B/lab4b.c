@@ -105,6 +105,7 @@ void handleCommand(const char* command) {
 				printf("HELLO: %d\n", atoi(&command[k]));
 				handleInvalidCommand(command);
 			}
+			k++;
 		}
 		handlePeriod(atoi(&command[7]), command);
 	}
