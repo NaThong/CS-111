@@ -22,7 +22,7 @@ const int B = 4275; // value of thermistor
 int period = 1;
 char scale = 'F';
 FILE *logFile = NULL;
-int start = 1;
+int run = 1;
 
 double getTemperature(int rawTemperature, char scale) {
 	double temp = 1023.0 / ((double)rawTemperature) - 1.0;
@@ -57,7 +57,7 @@ void handleShutdown(FILE *logFile) {
 }
 
 void handleStartStop(const int newValue, const char* command) {
-	start = newValue;
+	run = newValue;
 	fprintf(stdout, "start is now: %d", start);
 	printCommand(command);
 }
@@ -153,13 +153,11 @@ int main(int argc, char **argv) {
 		strftime(timeString, 10, "%H:%M:%S", timeInfo);
 
 		// print to stdout and log file
-		if (start == 1) {
-			fprintf(stdout, "%s %.1f\n", timeString, processedTemperature);
-			if (logFile) {
-				fprintf(logFile, "%s %.1f\n", timeString, processedTemperature);
-			}
-			fflush(logFile); // flush out buffer to make sure log file is written
+		fprintf(stdout, "%s %.1f\n", timeString, processedTemperature);
+		if (logFile) {
+			fprintf(logFile, "%s %.1f\n", timeString, processedTemperature);
 		}
+		fflush(logFile); // flush out buffer to make sure log file is written
 
 		time(&start); // start the timer
 		time(&end);	// sample ending time
@@ -180,8 +178,8 @@ int main(int argc, char **argv) {
 				scanf("%s", command);
 				handleCommand(command);
 			}
-
-			time(&end); // sample new ending time
+			if (run)
+				time(&end); // sample new ending time
 		}
 	}
 
