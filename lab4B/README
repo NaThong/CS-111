@@ -4,3 +4,11 @@ ID: 004-611-638
 
 Included Files:
 
+lab4b.c: C source file that compiles into the temperature sensing program
+specified within the spec.
+
+Makefile: Makefile that supports the required targets in the spec such as
+default, check, clean, and dist.
+
+testscript.sh: Shell script that's ran when running make check. It's adapted
+from the provided sanity check within the spec.

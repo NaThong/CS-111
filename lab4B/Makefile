@@ -14,4 +14,4 @@ clean:
 	rm -f lab4b *.txt *.tar.gz
 
 dist:
-	tar -czf lab4b-004611638.tar.gz Makefile README lab4b.c
+	tar -czf lab4b-004611638.tar.gz Makefile README lab4b.c testscript.sh
