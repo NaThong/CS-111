@@ -86,10 +86,24 @@ void handleCommand(const char* command) {
 	else if (strcmp(command, "START") == 0) handleStartStop(1, command);
 	else if (strcmp(command, "SCALE=F") == 0) handleScale('F', command);
 	else if (strcmp(command, "SCALE=C") == 0) handleScale('C', command);
-	else if (sscanf(command, "PERIOD=%d", newPeriod)) {
-		printf("received new period: %d", newPeriod);
+	else {
+		char prefix[] = "PERIOD=";
+		int k = 0;
+		int match = 1;
+		if (strlen(command) <= strlen(prefix)) handleInvalidCommand(command);
+		while (prefix[k] != '\0' && command[k] != '\0') {
+			if (prefix[k] != command[k])
+				match = 0;
+			k++;
+		}
+		if (!match) handleInvalidCommand(command);
+		while (command[k] != '\0') {
+			if (!isdigit(atoi(command[k]))) handleInvalidCommand(command);
+			k++;
+		}
+		handlePeriod(atoi(command[7]));
 	}
-	else handleInvalidCommand(command);
+	// else handleInvalidCommand(command);
 }
 
 int main(int argc, char **argv) {
