@@ -1,20 +1,5 @@
 #!/bin/bash
-#
-# sanity check script for Project 2B
-#	tarball name
-#	tarball contents
-#	student identification
-#	makefile targets
-#	use of expected functions
-#	error free build
-#	unrecognized parameters
-#	recognizes standard parameters
-#
-# Note: if you dummy up the sensor sampling
-#	this test script can be run on any
-#	Linux system.
-#
-#
+
 LAB="lab4b"
 README="README"
 MAKEFILE="Makefile"
@@ -27,42 +12,6 @@ PGMS=$PGM
 TIMEOUT=5
 
 let errors=0
-
-if [ -z "$1" ]
-then
-	echo usage: $0 your-student-id
-	exit 1
-else
-	student=$1
-fi
-
-# make sure the tarball has the right name
-tarball="$LAB-$student.tar.gz"
-if [ ! -s $tarball ]
-then
-	echo "ERROR: Unable to find submission tarball:" $tarball
-	exit 1
-fi
-
-# make sure we can untar it
-TEMP="/tmp/TestTemp.$$"
-echo "... Using temporary testing directory" $TEMP
-function cleanup {
-	cd
-	rm -rf $TEMP
-	exit $1
-}
-
-mkdir $TEMP
-cp $tarball $TEMP
-cd $TEMP
-echo "... untaring" $tarbsll
-tar xvf $tarball
-if [ $? -ne 0 ]
-then
-	echo "ERROR: Error untarring $tarball"
-	cleanup 1
-fi
 
 # make sure we find all the expected files
 echo "... checking for expected files"

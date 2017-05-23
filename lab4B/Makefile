@@ -8,7 +8,7 @@ default:
 	gcc -lmraa -lm -g lab4b.c -o lab4b
 
 check:
-	echo "check target"
+	./testscript.sh
 
 clean:
 	rm -f lab4b *.txt
