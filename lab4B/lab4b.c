@@ -100,11 +100,7 @@ void handleCommand(const char* command) {
 			printf("match: %d\n", match);
 			handleInvalidCommand(command);
 		}
-		while (command[k] != '\0') {
-			printf("HELLO: %d\n", atoi(&command[k]));
-			if (!isdigit(atoi(&command[k]))) handleInvalidCommand(command);
-			k++;
-		}
+		if (!isdigit(atoi(&command[k]))) handleInvalidCommand(command);
 		handlePeriod(atoi(&command[7]), command);
 	}
 	// else handleInvalidCommand(command);
