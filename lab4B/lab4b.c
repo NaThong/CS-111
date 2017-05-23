@@ -72,7 +72,7 @@ void handlePeriod(int newPeriod, const char* command) {
 }
 
 void handleInvalidCommand(const char* command) {
-	printCommand(command)
+	printCommand(command);
 	printCommand("error: invalid command");
 	exit(1);
 }
