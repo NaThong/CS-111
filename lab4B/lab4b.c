@@ -67,6 +67,7 @@ void handleScale(char newScale, const char* command) {
 }
 
 void handlePeriod(int newPeriod, const char* command) {
+	printCommand(command);
 	period = newPeriod;
 }
 
@@ -109,7 +110,6 @@ void handleCommand(const char* command) {
 		}
 		handlePeriod(atoi(&command[7]), command);
 	}
-	// else handleInvalidCommand(command);
 }
 
 int main(int argc, char **argv) {
