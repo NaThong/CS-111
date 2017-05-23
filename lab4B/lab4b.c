@@ -98,10 +98,10 @@ void handleCommand(const char* command) {
 		}
 		if (!match) handleInvalidCommand(command);
 		while (command[k] != '\0') {
-			if (!isdigit(atoi(command[k]))) handleInvalidCommand(command);
+			if (!isdigit(atoi(&command[k]))) handleInvalidCommand(command);
 			k++;
 		}
-		handlePeriod(atoi(command[7]));
+		handlePeriod(atoi(&command[7]));
 	}
 	// else handleInvalidCommand(command);
 }
