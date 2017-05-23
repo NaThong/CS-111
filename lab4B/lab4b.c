@@ -153,7 +153,7 @@ int main(int argc, char **argv) {
 		strftime(timeString, 10, "%H:%M:%S", timeInfo);
 
 		// print to stdout and log file
-		if (start) {
+		if (start == 1) {
 			fprintf(stdout, "%s %.1f\n", timeString, processedTemperature);
 			if (logFile) {
 				fprintf(logFile, "%s %.1f\n", timeString, processedTemperature);
