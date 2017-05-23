@@ -50,8 +50,9 @@ void handleShutdown(FILE *logFile) {
 	strftime(timeString, 10, "%H:%M:%S", localTimeInfo);
 
 	// print log and exit
-	if (logFile)
+	if (logFile) {
 		fprintf(logFile, "%s SHUTDOWN\n", timeString);
+	}
 	exit(0);
 }
 
@@ -70,7 +71,8 @@ void handlePeriod(int newPeriod, const char* command) {
 	period = newPeriod;
 }
 
-void handleInvalidCommand() {
+void handleInvalidCommand(const char* command) {
+	printCommand(command)
 	printCommand("error: invalid command");
 	exit(1);
 }
@@ -84,7 +86,7 @@ void handleCommand(const char* command) {
 	else if (strcmp(command, "START") == 0) handleStartStop(1, command);
 	else if (strcmp(command, "SCALE=F") == 0) handleScale('F', command);
 	else if (strcmp(command, "SCALE=C") == 0) handleScale('C', command);
-	else handleInvalidCommand();
+	else handleInvalidCommand(command);
 }
 
 int main(int argc, char **argv) {
@@ -151,11 +153,13 @@ int main(int argc, char **argv) {
 		strftime(timeString, 10, "%H:%M:%S", timeInfo);
 
 		// print to stdout and log file
-		fprintf(stdout, "%s %.1f\n", timeString, processedTemperature);
-		if (logFile) {
-			fprintf(logFile, "%s %.1f\n", timeString, processedTemperature);
+		if (start) {
+			fprintf(stdout, "%s %.1f\n", timeString, processedTemperature);
+			if (logFile) {
+				fprintf(logFile, "%s %.1f\n", timeString, processedTemperature);
+			}
+			fflush(logFile); // flush out buffer to make sure log file is written
 		}
-		fflush(logFile); // flush out buffer to make sure log file is written
 
 		time(&start); // start the timer
 		time(&end);	// sample ending time
@@ -177,10 +181,7 @@ int main(int argc, char **argv) {
 				handleCommand(command);
 			}
 
-			if (start == 1) {
-				fprintf(stdout, "getting time\n");
-				// time(&end); // sample new ending time
-			}
+			time(&end); // sample new ending time
 		}
 	}
 
