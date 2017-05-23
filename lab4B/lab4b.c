@@ -58,7 +58,6 @@ void handleShutdown(FILE *logFile) {
 
 void handleStartStop(const int newValue, const char* command) {
 	run = newValue;
-	fprintf(stdout, "run is now: %d", run);
 	printCommand(command);
 }
 
