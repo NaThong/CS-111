@@ -77,6 +77,7 @@ void handleInvalidCommand(const char* command) {
 }
 
 void handleCommand(const char* command) {
+	int newPeriod;
 	if (strcmp(command, "OFF") == 0) {
 		printCommand("OFF");
 		handleShutdown(logFile);
@@ -85,6 +86,8 @@ void handleCommand(const char* command) {
 	else if (strcmp(command, "START") == 0) handleStartStop(1, command);
 	else if (strcmp(command, "SCALE=F") == 0) handleScale('F', command);
 	else if (strcmp(command, "SCALE=C") == 0) handleScale('C', command);
+	else if (sscanf(command, "PERIOD=%d", newPeriod))
+		handlePeriod(newPeriod, command);
 	else handleInvalidCommand(command);
 }
 
