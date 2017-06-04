@@ -270,4 +270,4 @@ dist:
 	SortedList.c lab2_list.c Makefile lab2_add.csv lab2_list.csv \
 	lab2_add-1.png lab2_add-2.png lab2_add-3.png lab2_add-4.png \
 	lab2_add-5.png lab2_list-1.png lab2_list-2.png lab2_list-3.png \
-	lab2_list-4.png README 
+	lab2_list-4.png README lab2_add.gp lab2_list.gp 
