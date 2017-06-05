@@ -89,47 +89,126 @@ void* listOperations(void* threadIndex) {
     int k;
     int totalElements = numThreads * numIterations;
 
-    if (syncOption == 'm') {
-        printf("locking mutex");
-        pthread_mutex_lock(&mutex);
-    }
-    else if (syncOption == 's') {
-        printf("locking spin lock");
-        while (__sync_lock_test_and_set(&spinCondition, 1));
-    }
+    // if (syncOption == 'm') {
+    //     printf("locking mutex");
+    //     pthread_mutex_lock(&mutex);
+    // }
+    // else if (syncOption == 's') {
+    //     printf("locking spin lock");
+    //     while (__sync_lock_test_and_set(&spinCondition, 1));
+    // }
 
     for (k= *(int*)threadIndex; k < totalElements; k += numThreads) {
-        SortedList_insert(list, &elementList[k]);
+        switch (syncOption) {
+            case 'm':
+                pthread_mutex_lock(&mutex);
+                SortedList_insert(list, &elementList[k]);
+                pthread_mutex_unlock(&mutex);
+                break;
+            case 's':
+                while (__sync_lock_test_and_set(&spinCondition, 1));
+                SortedList_insert(list, &elementList[k]);
+                __sync_lock_release(&spinCondition);
+                break;
+            default:
+                SortedList_insert(list, &elementList[k]);
+        }
+        // SortedList_insert(list, &elementList[k]);
     }
 
-    if (SortedList_length(list) == -1) {
-        fprintf(stderr, "error: failed to get length of list\n");
-        exit(2);
-    }
-
-    // lookup and delete previously inserted elements
-    SortedListElement_t *temp = NULL;
-    for (k = *(int*)threadIndex; k < totalElements; k += numThreads) {
-        temp = SortedList_lookup(list, elementList[k].key);
-		if (temp == NULL) {
-		    fprintf(stderr, "error: failed to find element we already inserted\n");
-		    exit(2);
-		}
-        // if list corrupted, log error and exit with status
-        if (SortedList_delete(temp)) {
-            fprintf(stderr, "error: failed to delete an element we already inserted\n");
+    switch (syncOption) {
+        case 'm':
+            pthread_mutex_lock(&mutex);
+            if (SortedList_length(list) == -1) {
+                fprintf(stderr, "error: failed to get length of list\n");
+                exit(2);
+            }
+            pthread_mutex_unlock(&mutex);
+            break;
+        case 's':
+            while (__sync_lock_test_and_set(&spinCondition, 1));
+            if (SortedList_length(list) == -1) {
+                fprintf(stderr, "error: failed to get length of list\n");
+                exit(2);
+            }
+            __sync_lock_release(&spinCondition);
+            break;
+        default:
+        if (SortedList_length(list) == -1) {
+            fprintf(stderr, "error: failed to get length of list\n");
             exit(2);
         }
     }
 
-    if (syncOption == 'm') {
-        printf("unlocking mutex");
-        pthread_mutex_unlock(&mutex);
+    // if (SortedList_length(list) == -1) {
+    //     fprintf(stderr, "error: failed to get length of list\n");
+    //     exit(2);
+    // }
+
+    // lookup and delete previously inserted elements
+    SortedListElement_t *temp = NULL;
+    for (k = *(int*)threadIndex; k < totalElements; k += numThreads) {
+        switch (syncOption) {
+            case 'm':
+                pthread_mutex_lock(&mutex);
+                temp = SortedList_lookup(list, elementList[k].key);
+        		if (temp == NULL) {
+        		    fprintf(stderr, "error: failed to find element we already inserted\n");
+        		    exit(2);
+        		}
+                // if list corrupted, log error and exit with status
+                if (SortedList_delete(temp)) {
+                    fprintf(stderr, "error: failed to delete an element we already inserted\n");
+                    exit(2);
+                }
+                pthread_mutex_unlock(&mutex);
+                break;
+            case 's':
+                while (__sync_lock_test_and_set(&spinCondition, 1));
+                temp = SortedList_lookup(list, elementList[k].key);
+        		if (temp == NULL) {
+        		    fprintf(stderr, "error: failed to find element we already inserted\n");
+        		    exit(2);
+        		}
+                // if list corrupted, log error and exit with status
+                if (SortedList_delete(temp)) {
+                    fprintf(stderr, "error: failed to delete an element we already inserted\n");
+                    exit(2);
+                }
+                __sync_lock_release(&spinCondition);
+                break;
+            default:
+                temp = SortedList_lookup(list, elementList[k].key);
+        		if (temp == NULL) {
+        		    fprintf(stderr, "error: failed to find element we already inserted\n");
+        		    exit(2);
+        		}
+                // if list corrupted, log error and exit with status
+                if (SortedList_delete(temp)) {
+                    fprintf(stderr, "error: failed to delete an element we already inserted\n");
+                    exit(2);
+                }
+        }
+        // temp = SortedList_lookup(list, elementList[k].key);
+		// if (temp == NULL) {
+		//     fprintf(stderr, "error: failed to find element we already inserted\n");
+		//     exit(2);
+		// }
+        // // if list corrupted, log error and exit with status
+        // if (SortedList_delete(temp)) {
+        //     fprintf(stderr, "error: failed to delete an element we already inserted\n");
+        //     exit(2);
+        // }
     }
-    else if (syncOption == 's') {
-        printf("unlocking spin");
-        __sync_lock_release(&spinCondition);
-    }
+
+    // if (syncOption == 'm') {
+    //     printf("unlocking mutex");
+    //     pthread_mutex_unlock(&mutex);
+    // }
+    // else if (syncOption == 's') {
+    //     printf("unlocking spin");
+    //     __sync_lock_release(&spinCondition);
+    // }
 
     return NULL;
 }
