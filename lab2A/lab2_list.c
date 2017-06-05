@@ -27,15 +27,16 @@ char returnString[50] = "";
 
 char* getTestTag() {
     // append proper yield tag
-    if (strlen(yieldString) == 0) { strcat(returnString, "-none"); }
-    else {
-	strcat(returnString, "-");
-	int k = 0;
-	for (k = 0; *(yieldString + k) != '\0'; k++) {
-	    if (*(yieldString + k) == 'i') { strcat(returnString, "i"); }
-	    else if (*(yieldString + k) == 'd') { strcat(returnString, "d"); }
-	    else if (*(yieldString + k) == 'l') { strcat(returnString, "l"); }
-	}
+    if (strlen(yieldString) == 0) {
+        strcat(returnString, "-none");
+    } else {
+    	strcat(returnString, "-");
+    	int k = 0;
+    	for (k = 0; *(yieldString + k) != '\0'; k++) {
+    	    if (*(yieldString + k) == 'i') { strcat(returnString, "i"); }
+    	    else if (*(yieldString + k) == 'd') { strcat(returnString, "d"); }
+    	    else if (*(yieldString + k) == 'l') { strcat(returnString, "l"); }
+    	}
     }
 
     // append proper sync tag
@@ -54,7 +55,7 @@ void segFaultHandler() {
 void setYieldOption(char* yieldOptions) {
     yieldString = yieldOptions;
     const char validYieldOptions[] = {'i', 'd', 'l'}; // initialize array of valid yield options
-    
+
     // iterate through yield options and set opt_yield accordingly
     int k = 0;
     for (k = 0; *(yieldOptions + k) != '\0'; k++) {
@@ -88,8 +89,14 @@ void* listOperations(void* threadIndex) {
     int k;
     int totalElements = numThreads * numIterations;
 
-    if (syncOption == 'm') { pthread_mutex_lock(&mutex); }
-    else if (syncOption == 's') { while (__sync_lock_test_and_set(&spinCondition, 1)); }
+    if (syncOption == 'm') {
+        printf("locking mutex");
+        pthread_mutex_lock(&mutex);
+    }
+    else if (syncOption == 's') {
+        printf("locking spin lock");
+        while (__sync_lock_test_and_set(&spinCondition, 1));
+    }
 
     for (k= *(int*)threadIndex; k < totalElements; k += numThreads) {
         SortedList_insert(list, &elementList[k]);
@@ -115,8 +122,14 @@ void* listOperations(void* threadIndex) {
         }
     }
 
-    if (syncOption == 'm') { pthread_mutex_unlock(&mutex); }
-    else if (syncOption == 's') { __sync_lock_release(&spinCondition); }
+    if (syncOption == 'm') {
+        printf("unlocking mutex");
+        pthread_mutex_unlock(&mutex);
+    }
+    else if (syncOption == 's') {
+        printf("unlocking spin");
+        __sync_lock_release(&spinCondition);
+    }
 
     return NULL;
 }
