@@ -306,7 +306,7 @@ int main(int argc, char **argv) {
 
     // print test output
     char* testTag = getTestTag();
-    printf("list%s,%d,%d,1,%d,%d,%d\n", testTag, numThreads, numIterations, numOperations, totalTime, costPerOperation);
+    printf("list%s,%d,%d,1,%d,%u,%d\n", testTag, numThreads, numIterations, numOperations, totalTime, costPerOperation);
 
     int listLength = SortedList_length(list);
     if (listLength != 0) { exit(2); } // exit 2 if list length is not 0
