@@ -1,0 +1,19 @@
+NAME: Jeffrey Chan, Jiwan Kang
+EMAIL: jeffschan97@gmail.com, jiwan226@gmail.com
+ID: 004611638, 704624623
+
+Included Files:
+
+Makefile - Makefile that contains targets for default, clean, and dist
+
+README - file that contains description on included files, and usage of slip
+days.
+
+lab3b - Shell script that runs the lab3b.py python script. It can take multiple
+file arguments and pass them into lab3b.py
+
+lab3b.py - Python script that can take multiple files and run the audit reports
+specified within the spec
+
+Usage of Slip Days:
+1 of Jeffrey's slip days
