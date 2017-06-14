@@ -232,7 +232,7 @@ int main(int argc, char **argv) {
 
 			if ((pollfdArray[0].revents & POLLIN)) {
 				char command[50];
-				scanf("%s", command);
+				// scanf("%s", command);
                 dprintf(socketFD, "command: %s\n", command);
 				handleCommand(command);
 			}
