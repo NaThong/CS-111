@@ -168,9 +168,9 @@ int main(int argc, char **argv) {
 
     // initialize connection
     serverAddress.sin_family = AF_INET; // set address family
-    memcpy((char *)&serveraddr.sin_addr.s_addr, (char *)server->h_addr, server->h_length); // get ip address of server
-    serveraddr.sin_port = htons(portno); // store port number
-    if (connect(socketFD, (struct sockaddr*) &serverAddress, sizeof(serveraddr)) < 0) {
+    memcpy((char *)&serverAddress.sin_addr.s_addr, (char *)server->h_addr, server->h_length); // get ip address of server
+    serverAddress.sin_port = htons(port); // store port number
+    if (connect(socketFD, (struct sockaddr*) &serverAddress, sizeof(serverAddress)) < 0) {
         fprintf(stderr, "error: error in connecting to server\n");
         exit(1);
     }
