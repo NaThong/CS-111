@@ -161,25 +161,6 @@ int main(int argc, char **argv) {
     // get port number (guaratneed to be last argument)
     port = atoi(argv[argc - 1]);
 
-    // // create a socket and find host
-    server = gethostbyname(host);
-    if (server == NULL) {
-        fprintf(stderr, "error: error in finding host\n");
-        exit(1);
-    }
-
-    // initialize connection
-    serverAddress.sin_family = AF_INET; // set address family
-    memcpy((char *)&serverAddress.sin_addr.s_addr, (char *)server->h_addr, server->h_length); // get ip address of server
-    serverAddress.sin_port = htons(port); // store port number
-    if (connect(socketFD, (struct sockaddr*) &serverAddress, sizeof(serverAddress)) < 0) {
-        fprintf(stderr, "error: error in connecting to server\n");
-        exit(1);
-    }
-    //
-    // // print ID
-    // dprintf(socketFD, "ID=%d\n", id);
-
     OpenSSL_add_all_algorithms();
     SSL_load_error_strings();
 
@@ -222,6 +203,8 @@ int main(int argc, char **argv) {
         fprintf(stderr, "error: error in building a SSL/TLS session\n");
         exit(1);
     }
+
+    dprintf(socketFD, "ID=%d\n", id);
 
 	// initialize temperature sensor at A0
 	mraa_aio_context temperatureSensor;
