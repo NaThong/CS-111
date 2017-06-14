@@ -239,7 +239,7 @@ int main(int argc, char **argv) {
     			char c;
     			int buffIndex = 0;
     	  		while (1) {
-    				if(read(sockfd, &c, 1) > 0) {
+    				if(read(socketFD, &c, 1) > 0) {
     					if (c == '\n') {
     						commBuff[buffIndex] = '\0';
     						buffIndex = 0;
