@@ -205,7 +205,8 @@ int main(int argc, char **argv) {
     }
 
     // dprintf(socketFD, "ID=%d\n", id);
-    SSL_write(ssl, "hello\n", strlen("hello") + 1);
+    char buffer[50] = "hello, world\n";
+    SSL_write(ssl, buffer, strlen(buffer) + 1);
 
 	// initialize temperature sensor at A0
 	mraa_aio_context temperatureSensor;
