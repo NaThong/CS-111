@@ -176,68 +176,69 @@ int main(int argc, char **argv) {
     // print ID
     dprintf(socketFD, "ID=%d\n", id);
 
-	// // initialize temperature sensor at A0
-	// mraa_aio_context temperatureSensor;
-	// temperatureSensor = mraa_aio_init(0);
-    //
-	// // initialize button at D3
-	// mraa_gpio_context button;
-	// button = mraa_gpio_init(3);
-	// mraa_gpio_dir(button, MRAA_GPIO_IN);
-    //
-	// // to hold raw temperature read by temperature sensor
-	// int rawTemperature = 0;
-    //
-	// // initialize time variables
-	// time_t timer, start, end;
-	// char timeString[10];
-	// struct tm* timeInfo;
-    //
-	// // initialize poll structures
-	// struct pollfd pollfdArray[1];
-	// pollfdArray[0].fd = socketFD; //STDIN_FILENO; // polls from stdin
-	// pollfdArray[0].events = POLLIN | POLLHUP | POLLERR;
-    //
-	// while (1) {
-	// 	// get temperature
-	// 	rawTemperature = mraa_aio_read(temperatureSensor);
-	// 	double processedTemperature = getTemperature(rawTemperature, scale);
-    //
-	// 	// get current time
-	// 	time(&timer);
-	// 	timeInfo = localtime(&timer);
-	// 	strftime(timeString, 10, "%H:%M:%S", timeInfo);
-    //
-	// 	// print to stdout and log file
-	// 	dprintf(socketFD, "%s %.1f\n", timeString, processedTemperature);
-	// 	if (logFile) {
-	// 		fprintf(logFile, "%s %.1f\n", timeString, processedTemperature);
-	// 	}
-	// 	fflush(logFile); // flush out buffer to make sure log file is written
-    //
-	// 	time(&start); // start the timer
-	// 	time(&end);	// sample ending time
-	// 	while (difftime(end, start) < period) {
-	// 		// read from button and shutdown if needed
-	// 		if (mraa_gpio_read(button))
-	// 			handleShutdown(logFile);
-    //
-	// 		// poll for input
-	// 		int returnValue = poll(pollfdArray, 1, 0);
-	// 		if (returnValue < 0) {
-	// 			fprintf(stderr, "error: error while polling\n");
-	// 			exit(1);
-	// 		}
-    //
-	// 		if ((pollfdArray[0].revents & POLLIN)) {
-	// 			char command[50];
-	// 			scanf("%s", command);
-	// 			handleCommand(command);
-	// 		}
-	// 		if (run)
-	// 			time(&end); // sample new ending time
-	// 	}
-	// }
+	// initialize temperature sensor at A0
+	mraa_aio_context temperatureSensor;
+	temperatureSensor = mraa_aio_init(0);
+
+	// initialize button at D3
+	mraa_gpio_context button;
+	button = mraa_gpio_init(3);
+	mraa_gpio_dir(button, MRAA_GPIO_IN);
+
+	// to hold raw temperature read by temperature sensor
+	int rawTemperature = 0;
+
+	// initialize time variables
+	time_t timer, start, end;
+	char timeString[10];
+	struct tm* timeInfo;
+
+	// initialize poll structures
+	struct pollfd pollfdArray[1];
+	pollfdArray[0].fd = socketFD; //STDIN_FILENO; // polls from stdin
+	pollfdArray[0].events = POLLIN | POLLHUP | POLLERR;
+
+	while (1) {
+		// get temperature
+		rawTemperature = mraa_aio_read(temperatureSensor);
+		double processedTemperature = getTemperature(rawTemperature, scale);
+
+		// get current time
+		time(&timer);
+		timeInfo = localtime(&timer);
+		strftime(timeString, 10, "%H:%M:%S", timeInfo);
+
+		// print to stdout and log file
+        fprintf(STDOUT_FILENNO, "%s %.1f\n", timeString, processedTemperature);
+		dprintf(socketFD, "%s %.1f\n", timeString, processedTemperature);
+		if (logFile) {
+			fprintf(logFile, "%s %.1f\n", timeString, processedTemperature);
+		}
+		fflush(logFile); // flush out buffer to make sure log file is written
+
+		time(&start); // start the timer
+		time(&end);	// sample ending time
+		while (difftime(end, start) < period) {
+			// read from button and shutdown if needed
+			if (mraa_gpio_read(button))
+				handleShutdown(logFile);
+
+			// poll for input
+			int returnValue = poll(pollfdArray, 1, 0);
+			if (returnValue < 0) {
+				fprintf(stderr, "error: error while polling\n");
+				exit(1);
+			}
+
+			if ((pollfdArray[0].revents & POLLIN)) {
+				char command[50];
+				scanf("%s", command);
+				handleCommand(command);
+			}
+			if (run)
+				time(&end); // sample new ending time
+		}
+	}
 
 	exit(0);
 }
