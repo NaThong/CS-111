@@ -210,7 +210,7 @@ int main(int argc, char **argv) {
     // write ID
     char idBuffer[50];
     memset(idBuffer, 0, 50);
-    sprintf(idBuffer, "%s\n", id);
+    sprintf(idBuffer, "ID=%s\n", id);
     SSL_write(ssl, idBuffer, strlen(idBuffer));
 
 	// initialize temperature sensor at A0

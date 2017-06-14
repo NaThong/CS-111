@@ -29,7 +29,7 @@ int run = 1;
 // option variables
 FILE *logFile = NULL;
 int port;
-int id;
+char *id;
 
 // host structures
 struct hostent *server;
@@ -142,7 +142,7 @@ int main(int argc, char **argv) {
 			case 'l':
 				logFile = fopen(optarg, "w"); break;
             case 'i':
-                id = atoi(optarg); break;
+                id = optarg; break;
             case 'h':
                 host = optarg; break;
 			default:
@@ -176,7 +176,7 @@ int main(int argc, char **argv) {
     }
 
     // print ID
-    dprintf(socketFD, "ID=%d\n", id);
+    dprintf(socketFD, "ID=%s\n", id);
 
 	// initialize temperature sensor at A0
 	mraa_aio_context temperatureSensor;
