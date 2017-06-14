@@ -16,6 +16,7 @@
 #include<sys/stat.h>
 #include<fcntl.h>
 #include<poll.h>
+#include<sys/socket.h>
 
 // GLOBAL VARIABLES
 const int B = 4275; // value of thermistor
@@ -25,6 +26,9 @@ FILE *logFile = NULL;
 int run = 1;
 int port;
 int id;
+
+// host structures
+struct hostent *server;
 char *host;
 
 double getTemperature(int rawTemperature, char scale) {
@@ -131,9 +135,9 @@ int main(int argc, char **argv) {
 			case 'l':
 				logFile = fopen(optarg, "w"); break;
             case 'i':
-                id = atoi(optarg); printf("id: %d\n", id); break;
+                id = atoi(optarg); break;
             case 'h':
-                host = optarg; printf("host: %s\n", host); break;
+                host = optarg; break;
 			default:
 				fprintf(stderr, "error: unrecognized argument\n");
 				exit(1);
@@ -142,6 +146,18 @@ int main(int argc, char **argv) {
 
     // get port number (guaratneed to be last argument)
     port = atoi(argv[argc - 1]);
+
+    // initialize tcp connection
+    socketFD = socket(AF_INET, SOCK_STREAM, 0);
+    if (socketFD < 0) {
+        fprintf(stderr, "error: error in opening socket\n");
+        exit(1);
+    }
+    server = gethostbyname(host);
+    if (server == NULL) {
+        fprintf(stderr, "error: error in finding host\n");
+        exit(1);
+    }
 
 	// initialize temperature sensor at A0
 	mraa_aio_context temperatureSensor;
