@@ -223,7 +223,7 @@ int main(int argc, char **argv) {
 			if (mraa_gpio_read(button))
 				handleShutdown(logFile);
 
-			poll for input
+			// poll for input
 			int returnValue = poll(pollfdArray, 1, 0);
 			if (returnValue < 0) {
 				fprintf(stderr, "error: error while polling\n");
@@ -234,7 +234,7 @@ int main(int argc, char **argv) {
 				// char command[50];
 				// // scanf("%s", command);
 				// handleCommand(command);
-                FILE* fdf = fdopen(sockfd, "r");
+                FILE* fdf = fdopen(socketFD, "r");
       			char commBuff[1024];
     			char c;
     			int buffIndex = 0;
