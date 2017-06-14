@@ -18,19 +18,25 @@
 #include<poll.h>
 #include<sys/socket.h>
 #include<netdb.h>
+#include<netinet/in.h>
 
 // GLOBAL VARIABLES
 const int B = 4275; // value of thermistor
 int period = 1;
 char scale = 'F';
-FILE *logFile = NULL;
 int run = 1;
+
+// option variables
+FILE *logFile = NULL;
 int port;
 int id;
 
 // host structures
 struct hostent *server;
 char *host = "";
+
+// socket structures
+struct sockaddr_in serverAddress;
 
 double getTemperature(int rawTemperature, char scale) {
 	double temp = 1023.0 / ((double)rawTemperature) - 1.0;
@@ -131,7 +137,7 @@ int main(int argc, char **argv) {
 	};
 
 	// iterate through options
-	while ((option = getopt_long(argc, argv, "p:s:l", options, NULL)) != -1) {
+	while ((option = getopt_long(argc, argv, "l:i:h", options, NULL)) != -1) {
 		switch (option) {
 			case 'l':
 				logFile = fopen(optarg, "w"); break;
@@ -148,7 +154,7 @@ int main(int argc, char **argv) {
     // get port number (guaratneed to be last argument)
     port = atoi(argv[argc - 1]);
 
-    // initialize tcp connection
+    // create a socket and find host
     int socketFD = socket(AF_INET, SOCK_STREAM, 0);
     if (socketFD < 0) {
         fprintf(stderr, "error: error in opening socket\n");
@@ -157,6 +163,15 @@ int main(int argc, char **argv) {
     server = gethostbyname(host);
     if (server == NULL) {
         fprintf(stderr, "error: error in finding host\n");
+        exit(1);
+    }
+
+    // initialize connection
+    serverAddress.sin_family = AF_INET; // set address family
+    memcpy((char *)&serveraddr.sin_addr.s_addr, (char *)server->h_addr, server->h_length); // get ip address of server
+    serveraddr.sin_port = htons(portno); // store port number
+    if (connect(socketFD, (struct sockaddr*) &serverAddress, sizeof(serveraddr)) < 0) {
+        fprintf(stderr, "error: error in connecting to server\n");
         exit(1);
     }
 
