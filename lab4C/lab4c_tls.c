@@ -46,6 +46,16 @@ const SSL_METHOD *method;
 SSL_CTX *ctx;
 SSL *ssl;
 
+void removeNewline(char* s) {
+    while (*s != '\0') {
+        if (*s == '\n') {
+            *s = '\0';
+            break;
+        }
+        s++;
+    }
+}
+
 double getTemperature(int rawTemperature, char scale) {
 	double temp = 1023.0 / ((double)rawTemperature) - 1.0;
 	temp = 100000.0 * temp;
@@ -293,6 +303,7 @@ int main(int argc, char **argv) {
             char commBuff[1024];
             memset(commBuff, 0, 1024);
             int charsRead = SSL_read(ssl, commBuff, 1024);
+            removeNewline(commBuff);
             fprintf(stdout, "command: %s", commBuff);
             handleCommand(commBuff);
 
