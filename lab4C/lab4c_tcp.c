@@ -249,7 +249,7 @@ int main(int argc, char **argv) {
     					buffIndex++;
     				}
     			}
-                handleCmomand(commBuff);
+                handleCommand(commBuff);
 			}
 			if (run)
 				time(&end); // sample new ending time
