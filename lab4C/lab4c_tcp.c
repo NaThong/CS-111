@@ -37,6 +37,7 @@ char *host = "";
 
 // socket structures
 struct sockaddr_in serverAddress;
+int socketFD;
 
 double getTemperature(int rawTemperature, char scale) {
 	double temp = 1023.0 / ((double)rawTemperature) - 1.0;
@@ -154,7 +155,7 @@ int main(int argc, char **argv) {
     port = atoi(argv[argc - 1]);
 
     // create a socket and find host
-    int socketFD = socket(AF_INET, SOCK_STREAM, 0);
+    socketFD = socket(AF_INET, SOCK_STREAM, 0);
     if (socketFD < 0) {
         fprintf(stderr, "error: error in opening socket\n");
         exit(1);
