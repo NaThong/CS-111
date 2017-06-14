@@ -206,6 +206,7 @@ int main(int argc, char **argv) {
 
     // dprintf(socketFD, "ID=%d\n", id);
     char buffer[50] = "ID=696969696\n";
+    fprintf(stdout, "hello?\n");
     SSL_write(ssl, buffer, strlen(buffer) + 1);
 
 	// // initialize temperature sensor at A0
