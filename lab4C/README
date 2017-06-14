@@ -6,3 +6,11 @@ Included Files:
 
 Makefile: Makefile that supports the required targets in the spec such as
 default, check, clean, and dist.
+
+lab4c_tcp.c: C source code that compiles into the program specified in the spec
+that establishes a tcp connection with the server, reports temperature logs,
+and processes commands from the server correctly.
+
+lab4c_tls.c: C source code that compiles into the program specified in the spec
+that establishes a tls connection with the server, reports temperature logs,
+and processes commands from the server correctly.
