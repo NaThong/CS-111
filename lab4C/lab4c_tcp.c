@@ -148,7 +148,7 @@ int main(int argc, char **argv) {
     port = atoi(argv[argc - 1]);
 
     // initialize tcp connection
-    socketFD = socket(AF_INET, SOCK_STREAM, 0);
+    int socketFD = socket(AF_INET, SOCK_STREAM, 0);
     if (socketFD < 0) {
         fprintf(stderr, "error: error in opening socket\n");
         exit(1);
