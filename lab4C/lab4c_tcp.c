@@ -23,6 +23,7 @@ int period = 1;
 char scale = 'F';
 FILE *logFile = NULL;
 int run = 1;
+int port;
 
 double getTemperature(int rawTemperature, char scale) {
 	double temp = 1023.0 / ((double)rawTemperature) - 1.0;
@@ -117,31 +118,29 @@ int main(int argc, char **argv) {
 
 	// arguments this program supports
 	static struct option options[] = {
-		{"period", required_argument, 0, 'p'},
-		{"scale", required_argument, 0, 's'},
-		{"log", required_argument, 0, 'l'}
+		{"log", required_argument, 0, 'l'},
+        {"id", required_argument, 0, 'i'},
+        {"host", required_argument, 0, 'h'}
 	};
 
 	// iterate through options
 	while ((option = getopt_long(argc, argv, "p:s:l", options, NULL)) != -1) {
 		switch (option) {
-			case 'p':
-				period = atoi(optarg); break;
-			case 's':
-				if (strlen(optarg) == 1 && (optarg[0] == 'C' || optarg[0] == 'F'))
-					scale = optarg[0];
-				else {
-					fprintf(stderr, "error: unrecognized scale argument\n");
-					exit(1);
-				}
-				break;
 			case 'l':
 				logFile = fopen(optarg, "w"); break;
+            case 'i':
+                printf("received id option\n"); break;
+            case 'h':
+                printf("received host option\n"); break;
 			default:
 				fprintf(stderr, "error: unrecognized argument\n");
 				exit(1);
 		}
 	}
+
+    // get port number
+    port = atoi(argv[argc - 1]);
+    printf("port number: %d\n", port);
 
 	// initialize temperature sensor at A0
 	mraa_aio_context temperatureSensor;
