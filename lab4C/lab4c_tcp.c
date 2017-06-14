@@ -49,7 +49,7 @@ double getTemperature(int rawTemperature, char scale) {
 }
 
 void printCommand(const char* command) {
-	if (logFile) dprintf(logFile, "%s\n", command);
+	if (logFile) fprintf(logFile, "%s\n", command);
 	fflush(logFile);
 }
 
@@ -65,7 +65,7 @@ void handleShutdown(FILE *logFile) {
 
 	// print log and exit
 	if (logFile) {
-		dprintf(logFile, "%s SHUTDOWN\n", timeString);
+		fprintf(logFile, "%s SHUTDOWN\n", timeString);
 	}
 	exit(0);
 }
@@ -144,7 +144,7 @@ int main(int argc, char **argv) {
             case 'h':
                 host = optarg; break;
 			default:
-				dprintf(stderr, "error: unrecognized argument\n");
+				fprintf(stderr, "error: unrecognized argument\n");
 				exit(1);
 		}
 	}
@@ -155,12 +155,12 @@ int main(int argc, char **argv) {
     // create a socket and find host
     int socketFD = socket(AF_INET, SOCK_STREAM, 0);
     if (socketFD < 0) {
-        dprintf(stderr, "error: error in opening socket\n");
+        fprintf(stderr, "error: error in opening socket\n");
         exit(1);
     }
     server = gethostbyname(host);
     if (server == NULL) {
-        dprintf(stderr, "error: error in finding host\n");
+        fprintf(stderr, "error: error in finding host\n");
         exit(1);
     }
 
@@ -169,9 +169,12 @@ int main(int argc, char **argv) {
     memcpy((char *)&serverAddress.sin_addr.s_addr, (char *)server->h_addr, server->h_length); // get ip address of server
     serverAddress.sin_port = htons(port); // store port number
     if (connect(socketFD, (struct sockaddr*) &serverAddress, sizeof(serverAddress)) < 0) {
-        dprintf(stderr, "error: error in connecting to server\n");
+        fprintf(stderr, "error: error in connecting to server\n");
         exit(1);
     }
+
+    // print ID
+    dprintf(socketFD, "ID: %d\n", id);
 
 	// initialize temperature sensor at A0
 	mraa_aio_context temperatureSensor;
@@ -208,7 +211,7 @@ int main(int argc, char **argv) {
 		// print to stdout and log file
 		dprintf(socketFD, "%s %.1f\n", timeString, processedTemperature);
 		if (logFile) {
-			dprintf(logFile, "%s %.1f\n", timeString, processedTemperature);
+			fprintf(logFile, "%s %.1f\n", timeString, processedTemperature);
 		}
 		fflush(logFile); // flush out buffer to make sure log file is written
 
@@ -222,7 +225,7 @@ int main(int argc, char **argv) {
 			// poll for input
 			int returnValue = poll(pollfdArray, 1, 0);
 			if (returnValue < 0) {
-				dprintf(stderr, "error: error while polling\n");
+				fprintf(stderr, "error: error while polling\n");
 				exit(1);
 			}
 
