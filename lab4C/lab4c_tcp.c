@@ -234,6 +234,22 @@ int main(int argc, char **argv) {
 				// char command[50];
 				// // scanf("%s", command);
 				// handleCommand(command);
+                FILE* fdf = fdopen(sockfd, "r");
+      			char commBuff[1024];
+    			char c;
+    			int buffIndex = 0;
+    	  		while (1) {
+    				if(read(sockfd, &c, 1) > 0) {
+    					if (c == '\n') {
+    						commBuff[buffIndex] = '\0';
+    						buffIndex = 0;
+    						break;
+    					}
+    					commBuff[buffIndex] = c;
+    					buffIndex++;
+    				}
+    			}
+                handleCmomand(commBuff);
 			}
 			if (run)
 				time(&end); // sample new ending time
