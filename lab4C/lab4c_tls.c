@@ -205,9 +205,8 @@ int main(int argc, char **argv) {
         exit(1);
     }
 
-    char idBuffer[50] = "ID=696969696\n";
-
-    SSL_write(ssl, idBuffer, strlen(buffer));
+    char idBuffer[50] = "ID=696969696";
+    SSL_write(ssl, idBuffer, strlen(idBuffer));
 
 	// // initialize temperature sensor at A0
 	// mraa_aio_context temperatureSensor;
