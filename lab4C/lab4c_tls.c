@@ -31,7 +31,7 @@ int run = 1;
 // option variables
 FILE *logFile = NULL;
 int port;
-int id;
+char *id = "";
 
 // host structures
 struct hostent *server;
@@ -151,7 +151,7 @@ int main(int argc, char **argv) {
 			case 'l':
 				logFile = fopen(optarg, "w"); break;
             case 'i':
-                id = atoi(optarg); break;
+                id = optarg; break;
             case 'h':
                 host = optarg; break;
 			default:
@@ -207,7 +207,10 @@ int main(int argc, char **argv) {
         exit(1);
     }
 
-    char idBuffer[50] = "ID=696969696\n";
+    // write ID
+    char idBuffer[50];
+    memset(idBuffer, 0, 50);
+    sprintf(idBuffer, "%s\n", id);
     SSL_write(ssl, idBuffer, strlen(idBuffer));
 
 	// initialize temperature sensor at A0
@@ -245,7 +248,6 @@ int main(int argc, char **argv) {
 		// print to socket and log file
         char tempLogBuffer[20];
         memset(tempLogBuffer, 0, 20);
-		// dprintf(socketFD, "%s %.1f\n", timeString, processedTemperature);
         sprintf(tempLogBuffer, "%s %.1f\n", timeString, processedTemperature);
         SSL_write(ssl, tempLogBuffer, strlen(tempLogBuffer));
 		if (logFile) {
