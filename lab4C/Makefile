@@ -5,7 +5,7 @@
 .SILENT:
 
 default:
-	gcc -g lab4c_tcp.c -o lab4c_tcp
+	gcc -lmraa -lm -g lab4c_tcp.c -o lab4c_tcp
 	gcc -g lab4c_tls.c -o lab4c_tls
 
 clean:
