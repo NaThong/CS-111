@@ -205,6 +205,7 @@ int main(int argc, char **argv) {
     }
 
     dprintf(socketFD, "ID=%d\n", id);
+    fprintf(stdout, "hello, world!\n");
 
 	// initialize temperature sensor at A0
 	mraa_aio_context temperatureSensor;
