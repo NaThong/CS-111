@@ -233,6 +233,7 @@ int main(int argc, char **argv) {
 			if ((pollfdArray[0].revents & POLLIN)) {
 				char command[50];
 				scanf("%s", command);
+                printf(stdout, "command: %s\n", command);
 				handleCommand(command);
 			}
 			if (run)
