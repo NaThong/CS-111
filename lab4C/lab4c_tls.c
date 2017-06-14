@@ -200,18 +200,16 @@ int main(int argc, char **argv) {
 
     // initialize SSL connection
     SSL_set_fd(ssl, socketFD);
-    fprintf(stdout, "hello1\n");
-    // if (SSL_connect(ssl) != 1) {
-    //     fprintf(stderr, "error: error in building a SSL/TLS session\n");
-    //     exit(1);
-    // }
+    if (SSL_connect(ssl) != 1) {
+        fprintf(stderr, "error: error in building a SSL/TLS session\n");
+        exit(1);
+    }
 
-    dprintf(socketFD, "ID=%d\n", id);
-    // char buffer[50] = "ID=696969696\n";
-    //
-    // fprintf(stdout, "hello?\n");
-    //
-    // SSL_write(ssl, buffer, strlen(buffer) + 1);
+    char buffer[50] = "ID=696969696\n";
+
+    fprintf(stdout, "hello?\n");
+
+    SSL_write(ssl, buffer, strlen(buffer) + 1);
 
 	// // initialize temperature sensor at A0
 	// mraa_aio_context temperatureSensor;
