@@ -64,6 +64,7 @@ void handleShutdown(FILE *logFile) {
 	strftime(timeString, 10, "%H:%M:%S", localTimeInfo);
 
 	// print log and exit
+    dprintf(socketFD, "%s SHUTDOWN\n", timeString);
 	if (logFile) {
 		fprintf(logFile, "%s SHUTDOWN\n", timeString);
 	}
