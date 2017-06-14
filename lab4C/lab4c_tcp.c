@@ -210,7 +210,7 @@ int main(int argc, char **argv) {
 
 		// print to stdout and log file
         fprintf(stdout, "%s %.1f\n", timeString, processedTemperature);
-		dprintf(socketFD, "%s %.1f\n", timeString, processedTemperature);
+		// dprintf(socketFD, "%s %.1f\n", timeString, processedTemperature);
 		if (logFile) {
 			fprintf(logFile, "%s %.1f\n", timeString, processedTemperature);
 		}
@@ -233,7 +233,7 @@ int main(int argc, char **argv) {
 			if ((pollfdArray[0].revents & POLLIN)) {
 				char command[50];
 				scanf("%s", command);
-                fprintf(stdout, "command: %s\n", command);
+                // fprintf(stdout, "command: %s\n", command);
 				handleCommand(command);
 			}
 			if (run)
