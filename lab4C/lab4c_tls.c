@@ -161,22 +161,23 @@ int main(int argc, char **argv) {
     // get port number (guaratneed to be last argument)
     port = atoi(argv[argc - 1]);
 
+    // initialize SSL and context structure
     OpenSSL_add_all_algorithms();
     SSL_load_error_strings();
-
     if (SSL_library_init() < 0) {
         fprintf(stderr, "error: error in initializing OpenSSL library\n");
         exit(1);
     }
-
     method = SSLv23_client_method();
     if ((ctx = SSL_CTX_new(method)) == NULL) {
         fprintf(stderr, "error: error in creating a new SSL context structure\n");
         exit(1);
     }
 
+    // create new SSL based on context structure
     ssl = SSL_new(ctx);
 
+    // create a new socket and connect it to the host
     socketFD = socket(AF_INET, SOCK_STREAM, 0);
     if (socketFD < 0) {
         fprintf(stderr, "error: error in opening socket\n");
@@ -188,7 +189,7 @@ int main(int argc, char **argv) {
         exit(1);
     }
 
-    // initialize connection
+    // initialize socket connection
     serverAddress.sin_family = AF_INET; // set address family
     memcpy((char *)&serverAddress.sin_addr.s_addr, (char *)server->h_addr, server->h_length); // get ip address of server
     serverAddress.sin_port = htons(port); // store port number
@@ -197,6 +198,7 @@ int main(int argc, char **argv) {
         exit(1);
     }
 
+    // initialize SSL connection
     SSL_set_fd(ssl, socketFD);
     fprintf(stdout, "hello1\n");
     if (SSL_connect(ssl) != 1) {
@@ -204,12 +206,12 @@ int main(int argc, char **argv) {
         exit(1);
     }
 
-    // dprintf(socketFD, "ID=%d\n", id);
-    char buffer[50] = "ID=696969696\n";
-
-    fprintf(stdout, "hello?\n");
-
-    SSL_write(ssl, buffer, strlen(buffer) + 1);
+    dprintf(socketFD, "ID=%d\n", id);
+    // char buffer[50] = "ID=696969696\n";
+    //
+    // fprintf(stdout, "hello?\n");
+    //
+    // SSL_write(ssl, buffer, strlen(buffer) + 1);
 
 	// // initialize temperature sensor at A0
 	// mraa_aio_context temperatureSensor;
