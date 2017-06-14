@@ -223,6 +223,8 @@ int main(int argc, char **argv) {
 			if (mraa_gpio_read(button))
 				handleShutdown(logFile);
 
+            fprintf(stdout, "hello??\n");
+
 			// poll for input
 			int returnValue = poll(pollfdArray, 1, 0);
 			if (returnValue < 0) {
