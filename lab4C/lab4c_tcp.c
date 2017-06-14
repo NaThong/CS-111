@@ -223,20 +223,18 @@ int main(int argc, char **argv) {
 			if (mraa_gpio_read(button))
 				handleShutdown(logFile);
 
-            fprintf(stdout, "hello??\n");
-
 			// poll for input
-			int returnValue = poll(pollfdArray, 1, 0);
-			if (returnValue < 0) {
-				fprintf(stderr, "error: error while polling\n");
-				exit(1);
-			}
-
-			if ((pollfdArray[0].revents & POLLIN)) {
-				char command[50];
-				// scanf("%s", command);
-				handleCommand(command);
-			}
+			// int returnValue = poll(pollfdArray, 1, 0);
+			// if (returnValue < 0) {
+			// 	fprintf(stderr, "error: error while polling\n");
+			// 	exit(1);
+			// }
+            //
+			// if ((pollfdArray[0].revents & POLLIN)) {
+			// 	char command[50];
+			// 	// scanf("%s", command);
+			// 	handleCommand(command);
+			// }
 			if (run)
 				time(&end); // sample new ending time
 		}
