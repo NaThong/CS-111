@@ -197,9 +197,8 @@ int main(int argc, char **argv) {
         exit(1);
     }
 
-    fprintf(stdout, "hello1\n");
-
     SSL_set_fd(ssl, socketFD);
+    fprintf(stdout, "hello1\n");
     if (SSL_connect(ssl) != 1) {
         fprintf(stderr, "error: error in building a SSL/TLS session\n");
         exit(1);
