@@ -195,7 +195,7 @@ int main(int argc, char **argv) {
 
 	// initialize poll structures
 	struct pollfd pollfdArray[1];
-	pollfdArray[0].fd = socketFD; //STDIN_FILENO; // polls from stdin
+	pollfdArray[0].fd = STDIN_FILENO; // polls from stdin
 	pollfdArray[0].events = POLLIN | POLLHUP | POLLERR;
 
 	while (1) {
