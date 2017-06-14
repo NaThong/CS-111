@@ -24,6 +24,8 @@ char scale = 'F';
 FILE *logFile = NULL;
 int run = 1;
 int port;
+int id;
+char *host;
 
 double getTemperature(int rawTemperature, char scale) {
 	double temp = 1023.0 / ((double)rawTemperature) - 1.0;
@@ -129,18 +131,17 @@ int main(int argc, char **argv) {
 			case 'l':
 				logFile = fopen(optarg, "w"); break;
             case 'i':
-                printf("received id option\n"); break;
+                id = atoi(optarg); printf("id: %d\n", id); break;
             case 'h':
-                printf("received host option\n"); break;
+                host = optarg; printf("host: %s\n", host); break;
 			default:
 				fprintf(stderr, "error: unrecognized argument\n");
 				exit(1);
 		}
 	}
 
-    // get port number
+    // get port number (guaratneed to be last argument)
     port = atoi(argv[argc - 1]);
-    printf("port number: %d\n", port);
 
 	// initialize temperature sensor at A0
 	mraa_aio_context temperatureSensor;
