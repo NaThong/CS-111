@@ -205,85 +205,85 @@ int main(int argc, char **argv) {
     }
 
     // dprintf(socketFD, "ID=%d\n", id);
-    char buffer[50] = "hello, world\n";
+    char buffer[50] = "ID=696969696\n";
     SSL_write(ssl, buffer, strlen(buffer) + 1);
 
-	// initialize temperature sensor at A0
-	mraa_aio_context temperatureSensor;
-	temperatureSensor = mraa_aio_init(0);
-
-	// initialize button at D3
-	mraa_gpio_context button;
-	button = mraa_gpio_init(3);
-	mraa_gpio_dir(button, MRAA_GPIO_IN);
-
-	// to hold raw temperature read by temperature sensor
-	int rawTemperature = 0;
-
-	// initialize time variables
-	time_t timer, start, end;
-	char timeString[10];
-	struct tm* timeInfo;
-
-	// initialize poll structures
-	struct pollfd pollfdArray[1];
-	pollfdArray[0].fd = socketFD; //STDIN_FILENO; // polls from stdin
-	pollfdArray[0].events = POLLIN | POLLHUP | POLLERR;
-
-	while (1) {
-		// get temperature
-		rawTemperature = mraa_aio_read(temperatureSensor);
-		double processedTemperature = getTemperature(rawTemperature, scale);
-
-		// get current time
-		time(&timer);
-		timeInfo = localtime(&timer);
-		strftime(timeString, 10, "%H:%M:%S", timeInfo);
-
-		// print to socket and log file
-		dprintf(socketFD, "%s %.1f\n", timeString, processedTemperature);
-		if (logFile) {
-			fprintf(logFile, "%s %.1f\n", timeString, processedTemperature);
-		}
-		fflush(logFile); // flush out buffer to make sure log file is written
-
-		time(&start); // start the timer
-		time(&end);	// sample ending time
-		while (difftime(end, start) < period) {
-			// read from button and shutdown if needed
-			if (mraa_gpio_read(button))
-				handleShutdown(logFile);
-
-			// poll for input
-			int returnValue = poll(pollfdArray, 1, 0);
-			if (returnValue < 0) {
-				fprintf(stderr, "error: error while polling\n");
-				exit(1);
-			}
-
-			if ((pollfdArray[0].revents & POLLIN)) {
-
-                FILE* fdf = fdopen(socketFD, "r");
-      			char commBuff[1024];
-    			char c;
-    			int buffIndex = 0;
-    	  		while (1) {
-    				if(read(socketFD, &c, 1) > 0) {
-    					if (c == '\n') {
-    						commBuff[buffIndex] = '\0';
-    						buffIndex = 0;
-    						break;
-    					}
-    					commBuff[buffIndex] = c;
-    					buffIndex++;
-    				}
-    			}
-                handleCommand(commBuff);
-			}
-			if (run)
-				time(&end); // sample new ending time
-		}
-	}
+	// // initialize temperature sensor at A0
+	// mraa_aio_context temperatureSensor;
+	// temperatureSensor = mraa_aio_init(0);
+    //
+	// // initialize button at D3
+	// mraa_gpio_context button;
+	// button = mraa_gpio_init(3);
+	// mraa_gpio_dir(button, MRAA_GPIO_IN);
+    //
+	// // to hold raw temperature read by temperature sensor
+	// int rawTemperature = 0;
+    //
+	// // initialize time variables
+	// time_t timer, start, end;
+	// char timeString[10];
+	// struct tm* timeInfo;
+    //
+	// // initialize poll structures
+	// struct pollfd pollfdArray[1];
+	// pollfdArray[0].fd = socketFD; //STDIN_FILENO; // polls from stdin
+	// pollfdArray[0].events = POLLIN | POLLHUP | POLLERR;
+    //
+	// while (1) {
+	// 	// get temperature
+	// 	rawTemperature = mraa_aio_read(temperatureSensor);
+	// 	double processedTemperature = getTemperature(rawTemperature, scale);
+    //
+	// 	// get current time
+	// 	time(&timer);
+	// 	timeInfo = localtime(&timer);
+	// 	strftime(timeString, 10, "%H:%M:%S", timeInfo);
+    //
+	// 	// print to socket and log file
+	// 	dprintf(socketFD, "%s %.1f\n", timeString, processedTemperature);
+	// 	if (logFile) {
+	// 		fprintf(logFile, "%s %.1f\n", timeString, processedTemperature);
+	// 	}
+	// 	fflush(logFile); // flush out buffer to make sure log file is written
+    //
+	// 	time(&start); // start the timer
+	// 	time(&end);	// sample ending time
+	// 	while (difftime(end, start) < period) {
+	// 		// read from button and shutdown if needed
+	// 		if (mraa_gpio_read(button))
+	// 			handleShutdown(logFile);
+    //
+	// 		// poll for input
+	// 		int returnValue = poll(pollfdArray, 1, 0);
+	// 		if (returnValue < 0) {
+	// 			fprintf(stderr, "error: error while polling\n");
+	// 			exit(1);
+	// 		}
+    //
+	// 		if ((pollfdArray[0].revents & POLLIN)) {
+    //
+    //             FILE* fdf = fdopen(socketFD, "r");
+    //   			char commBuff[1024];
+    // 			char c;
+    // 			int buffIndex = 0;
+    // 	  		while (1) {
+    // 				if(read(socketFD, &c, 1) > 0) {
+    // 					if (c == '\n') {
+    // 						commBuff[buffIndex] = '\0';
+    // 						buffIndex = 0;
+    // 						break;
+    // 					}
+    // 					commBuff[buffIndex] = c;
+    // 					buffIndex++;
+    // 				}
+    // 			}
+    //             handleCommand(commBuff);
+	// 		}
+	// 		if (run)
+	// 			time(&end); // sample new ending time
+	// 	}
+	// }
 
 	exit(0);
 }
