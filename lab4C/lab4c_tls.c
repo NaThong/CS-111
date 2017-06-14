@@ -46,16 +46,6 @@ const SSL_METHOD *method;
 SSL_CTX *ctx;
 SSL *ssl;
 
-void removeNewline(char* s) {
-    while (*s != '\0') {
-        if (*s == '\n') {
-            *s = '\0';
-            break;
-        }
-        s++;
-    }
-}
-
 double getTemperature(int rawTemperature, char scale) {
 	double temp = 1023.0 / ((double)rawTemperature) - 1.0;
 	temp = 100000.0 * temp;
@@ -268,44 +258,45 @@ int main(int argc, char **argv) {
 			if (mraa_gpio_read(button))
 				handleShutdown(logFile);
 
-		// 	// poll for input
-		// 	int returnValue = poll(pollfdArray, 1, 0);
-		// 	if (returnValue < 0) {
-		// 		fprintf(stderr, "error: error while polling\n");
-		// 		exit(1);
-		// 	}
-        //
-		// 	if ((pollfdArray[0].revents & POLLIN)) {
-        //         //
-        //         // FILE* fdf = fdopen(socketFD, "r");
-     //  	// 		char commBuff[1024];
-    	// 		// char c;
-    	// 		// int buffIndex = 0;
-        //         // while (1) {
-    	// 		// 	if(read(socketFD, &c, 1) > 0) {
-    	// 		// 		if (c == '\n') {
-    	// 		// 			commBuff[buffIndex] = '\0';
-    	// 		// 			buffIndex = 0;
-    	// 		// 			break;
-    	// 		// 		}
-    	// 		// 		commBuff[buffIndex] = c;
-    	// 		// 		buffIndex++;
-    	// 		// 	}
-    	// 		// }
-        //
-        //         char commBuff[1024];
-        //         memset(commBuff, 0, 1024);
-        //         int charsRead = SSL_read(ssl, commBuff, 1024);
-        //         fprintf(stdout, "command: %s\n", commBuff);
-        //         handleCommand(commBuff);
-		// 	}
+			// poll for input
+			int returnValue = poll(pollfdArray, 1, 0);
+			if (returnValue < 0) {
+				fprintf(stderr, "error: error while polling\n");
+				exit(1);
+			}
 
-            char commBuff[1024];
-            memset(commBuff, 0, 1024);
-            int charsRead = SSL_read(ssl, commBuff, 1024);
-            removeNewline(commBuff);
-            fprintf(stdout, "command: %s", commBuff);
-            handleCommand(commBuff);
+			if ((pollfdArray[0].revents & POLLIN)) {
+                //
+                // FILE* fdf = fdopen(socketFD, "r");
+      	// 		char commBuff[1024];
+    			// char c;
+    			// int buffIndex = 0;
+                // while (1) {
+    			// 	if(read(socketFD, &c, 1) > 0) {
+    			// 		if (c == '\n') {
+    			// 			commBuff[buffIndex] = '\0';
+    			// 			buffIndex = 0;
+    			// 			break;
+    			// 		}
+    			// 		commBuff[buffIndex] = c;
+    			// 		buffIndex++;
+    			// 	}
+    			// }
+
+                char commBuff[1024];
+                memset(commBuff, 0, 1024);
+                int charsRead = SSL_read(ssl, commBuff, 1024);
+                commBuff[strlen(commBuff) - 1] = '\0';
+                fprintf(stdout, "command: %s\n", commBuff);
+                handleCommand(commBuff);
+			}
+
+            // char commBuff[1024];
+            // memset(commBuff, 0, 1024);
+            // int charsRead = SSL_read(ssl, commBuff, 1024);
+            // removeNewline(commBuff);
+            // fprintf(stdout, "command: %s", commBuff);
+            // handleCommand(commBuff);
 
             // sample new ending time
 			if (run)
