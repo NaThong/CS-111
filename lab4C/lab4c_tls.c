@@ -259,33 +259,40 @@ int main(int argc, char **argv) {
 				handleShutdown(logFile);
 
 			// poll for input
-			// int returnValue = poll(pollfdArray, 1, 0);
-			// if (returnValue < 0) {
-			// 	fprintf(stderr, "error: error while polling\n");
-			// 	exit(1);
-			// }
-            //
-			// if ((pollfdArray[0].revents & POLLIN)) {
-            //
-            //     FILE* fdf = fdopen(socketFD, "r");
-      // 			char commBuff[1024];
-    		// 	char c;
-    		// 	int buffIndex = 0;
-            // le (1) {
-    		// 		if(read(socketFD, &c, 1) > 0) {
-    		// 			if (c == '\n') {
-    		// 				commBuff[buffIndex] = '\0';
-    		// 				buffIndex = 0;
-    		// 				break;
-    		// 			}
-    		// 			commBuff[buffIndex] = c;
-    		// 			buffIndex++;
-    		// 		}
-    		// 	}
-            //     handleCommand(commBuff);
-			// }
+			int returnValue = poll(pollfdArray, 1, 0);
+			if (returnValue < 0) {
+				fprintf(stderr, "error: error while polling\n");
+				exit(1);
+			}
+
+			if ((pollfdArray[0].revents & POLLIN)) {
+                //
+                // FILE* fdf = fdopen(socketFD, "r");
+      	// 		char commBuff[1024];
+    			// char c;
+    			// int buffIndex = 0;
+                // while (1) {
+    			// 	if(read(socketFD, &c, 1) > 0) {
+    			// 		if (c == '\n') {
+    			// 			commBuff[buffIndex] = '\0';
+    			// 			buffIndex = 0;
+    			// 			break;
+    			// 		}
+    			// 		commBuff[buffIndex] = c;
+    			// 		buffIndex++;
+    			// 	}
+    			// }
+
+                char commBuff[1024];
+                memset(commBuff, 0, 1024);
+                int charsRead = SSL_read(ssl, commBuff, 1024);
+                fprintf(stdout, "command: %s\n", commBuff);
+                handleCommand(commBuff);
+			}
+
+            // sample new ending time
 			if (run)
-				time(&end); // sample new ending time
+				time(&end);
 		}
 	}
 
