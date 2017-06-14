@@ -17,6 +17,7 @@
 #include<fcntl.h>
 #include<poll.h>
 #include<sys/socket.h>
+#include<netdb.h>
 
 // GLOBAL VARIABLES
 const int B = 4275; // value of thermistor
@@ -29,7 +30,7 @@ int id;
 
 // host structures
 struct hostent *server;
-char *host;
+char *host = "";
 
 double getTemperature(int rawTemperature, char scale) {
 	double temp = 1023.0 / ((double)rawTemperature) - 1.0;
