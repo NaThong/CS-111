@@ -170,17 +170,12 @@ int main(int argc, char **argv) {
     }
 
     method = SSLv23_client_method();
-
-    fprintf(stdout, "hello4\n");
-
     if ((ctx = SSL_CTX_new(method)) == NULL) {
         fprintf(stderr, "error: error in creating a new SSL context structure\n");
         exit(1);
     }
 
     ssl = SSL_new(ctx);
-
-    fprintf(stdout, "hello3\n");
 
     socketFD = socket(AF_INET, SOCK_STREAM, 0);
     if (socketFD < 0) {
@@ -192,8 +187,6 @@ int main(int argc, char **argv) {
         fprintf(stderr, "error: error in finding host\n");
         exit(1);
     }
-
-    fprintf(stdout, "hello2\n");
 
     // initialize connection
     serverAddress.sin_family = AF_INET; // set address family
