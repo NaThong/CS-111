@@ -242,7 +242,7 @@ int main(int argc, char **argv) {
 
 		// print to socket and log file
         char tempLogBuffer[20];
-        memset(buffer, 0, 20);
+        memset(tempLogBuffer, 0, 20);
 		// dprintf(socketFD, "%s %.1f\n", timeString, processedTemperature);
         sprintf(tempLogBuffer, "%s %.1f\n", timeString, processedTemperature);
         SSL_write(ssl, tempLogBuffer, strlen(tempLogBuffer));
