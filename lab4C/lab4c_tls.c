@@ -72,7 +72,9 @@ void handleShutdown(FILE *logFile) {
 	strftime(timeString, 10, "%H:%M:%S", localTimeInfo);
 
 	// print log and exit
-    dprintf(socketFD, "%s SHUTDOWN\n", timeString);
+    char shutdownBuffer[50];
+    sprintf(shutdownBuffer, "%s SHUTDOWN\n", timeString);
+    SSL_write(ssl, shutdownBuffer, strlen(shutdownBuffer));
 	if (logFile) {
 		fprintf(logFile, "%s SHUTDOWN\n", timeString);
 	}
@@ -266,37 +268,12 @@ int main(int argc, char **argv) {
 			}
 
 			if ((pollfdArray[0].revents & POLLIN)) {
-                //
-                // FILE* fdf = fdopen(socketFD, "r");
-      	// 		char commBuff[1024];
-    			// char c;
-    			// int buffIndex = 0;
-                // while (1) {
-    			// 	if(read(socketFD, &c, 1) > 0) {
-    			// 		if (c == '\n') {
-    			// 			commBuff[buffIndex] = '\0';
-    			// 			buffIndex = 0;
-    			// 			break;
-    			// 		}
-    			// 		commBuff[buffIndex] = c;
-    			// 		buffIndex++;
-    			// 	}
-    			// }
-
                 char commBuff[1024];
                 memset(commBuff, 0, 1024);
                 int charsRead = SSL_read(ssl, commBuff, 1024);
-                commBuff[strlen(commBuff) - 1] = '\0';
-                fprintf(stdout, "command: %s\n", commBuff);
+                commBuff[strlen(commBuff) - 1] = '\0'; // remove newline char
                 handleCommand(commBuff);
 			}
-
-            // char commBuff[1024];
-            // memset(commBuff, 0, 1024);
-            // int charsRead = SSL_read(ssl, commBuff, 1024);
-            // removeNewline(commBuff);
-            // fprintf(stdout, "command: %s", commBuff);
-            // handleCommand(commBuff);
 
             // sample new ending time
 			if (run)
