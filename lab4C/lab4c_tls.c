@@ -205,11 +205,9 @@ int main(int argc, char **argv) {
         exit(1);
     }
 
-    char buffer[50] = "ID=696969696\n";
+    char idBuffer[50] = "ID=696969696\n";
 
-    fprintf(stdout, "hello?\n");
-
-    SSL_write(ssl, buffer, strlen(buffer) + 1);
+    SSL_write(ssl, idBuffer, strlen(buffer));
 
 	// // initialize temperature sensor at A0
 	// mraa_aio_context temperatureSensor;
