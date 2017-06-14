@@ -112,12 +112,10 @@ void handleCommand(const char* command) {
 			k++;
 		}
 		if (!match) {
-			printf("match: %d\n", match);
 			handleInvalidCommand(command);
 		}
 		while (command[k] != '\0') {
 			if (!isdigit(command[k])) {
-				printf("HELLO: %d\n", atoi(&command[k]));
 				handleInvalidCommand(command);
 			}
 			k++;
@@ -194,7 +192,7 @@ int main(int argc, char **argv) {
 
 	// initialize poll structures
 	struct pollfd pollfdArray[1];
-	pollfdArray[0].fd = STDIN_FILENO; // polls from stdin
+	pollfdArray[0].fd = socketFD; //STDIN_FILENO; // polls from stdin
 	pollfdArray[0].events = POLLIN | POLLHUP | POLLERR;
 
 	while (1) {
@@ -208,7 +206,7 @@ int main(int argc, char **argv) {
 		strftime(timeString, 10, "%H:%M:%S", timeInfo);
 
 		// print to stdout and log file
-		fprintf(stdout, "%s %.1f\n", timeString, processedTemperature);
+		fprintf(socketFD, "%s %.1f\n", timeString, processedTemperature);
 		if (logFile) {
 			fprintf(logFile, "%s %.1f\n", timeString, processedTemperature);
 		}
