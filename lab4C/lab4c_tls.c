@@ -171,12 +171,16 @@ int main(int argc, char **argv) {
 
     method = SSLv23_client_method();
 
+    fprintf(stdout, "hello4\n");
+
     if ((ctx = SSL_CTX_new(method)) == NULL) {
         fprintf(stderr, "error: error in creating a new SSL context structure\n");
         exit(1);
     }
 
     ssl = SSL_new(ctx);
+
+    fprintf(stdout, "hello3\n");
 
     socketFD = socket(AF_INET, SOCK_STREAM, 0);
     if (socketFD < 0) {
@@ -189,6 +193,8 @@ int main(int argc, char **argv) {
         exit(1);
     }
 
+    fprintf(stdout, "hello2\n");
+
     // initialize connection
     serverAddress.sin_family = AF_INET; // set address family
     memcpy((char *)&serverAddress.sin_addr.s_addr, (char *)server->h_addr, server->h_length); // get ip address of server
@@ -198,6 +204,8 @@ int main(int argc, char **argv) {
         exit(1);
     }
 
+    fprintf(stdout, "hello1\n");
+
     SSL_set_fd(ssl, socketFD);
     if (SSL_connect(ssl) != 1) {
         fprintf(stderr, "error: error in building a SSL/TLS session\n");
@@ -206,7 +214,9 @@ int main(int argc, char **argv) {
 
     // dprintf(socketFD, "ID=%d\n", id);
     char buffer[50] = "ID=696969696\n";
+
     fprintf(stdout, "hello?\n");
+
     SSL_write(ssl, buffer, strlen(buffer) + 1);
 
 	// // initialize temperature sensor at A0
