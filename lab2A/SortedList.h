@@ -15,6 +15,7 @@ struct SortedListElement {
 	struct SortedListElement *next;
 	const char *key;
 };
+
 typedef struct SortedListElement SortedList_t;
 typedef struct SortedListElement SortedListElement_t;
 

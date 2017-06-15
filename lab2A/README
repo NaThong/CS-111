@@ -96,6 +96,3 @@ spec
 lab2_list.csv: test data used to generate the gnuplots
 
 lab2_list.gp: gnuplot script used to generate the plots
-
-Use of Slip Days:
-1 Slip Day

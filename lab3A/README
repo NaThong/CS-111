@@ -8,9 +8,3 @@ lab3a.c - C source code that compiles into the lab3a program specified within
 the project specifications.
 
 Makefile - Makefile that contains targets for default, clean, and dist
-
-README - file that contains description on included files, and usage of slip
-days.
-
-Use of Slip Days:
-1 Slip Day

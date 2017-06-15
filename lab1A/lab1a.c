@@ -50,8 +50,8 @@ void setInputMode() {
 
     // check if stdin is a terminal
     if (!isatty(STDIN_FILENO)) {
-	fprintf(stderr, "stdin not a terminal.\n");
-	exit(EXIT_FAILURE);
+        fprintf(stderr, "stdin not a terminal.\n");
+        exit(EXIT_FAILURE);
     }
 
     // save terminal attributes
@@ -64,24 +64,24 @@ void setInputMode() {
     terminalAttributes.c_cc[VMIN] = 1;
     terminalAttributes.c_cc[VTIME] = 0;
     if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &terminalAttributes) < 0) {
-	fprintf(stderr, "error: error in setting new termianl attributes");
-	exit(EXIT_FAILURE);
+        fprintf(stderr, "error: error in setting new termianl attributes");
+        exit(EXIT_FAILURE);
     }
 }
 
 void signalHandler(int signalNumber) {
     if (shellFlag && signalNumber == SIGINT) {
-	kill(pid, SIGINT);
+        kill(pid, SIGINT);
     }
     if (signalNumber == SIGPIPE) {
-	exit(0);
+        exit(0);
     }
 }
 
 void createPipe(int pipeHolder[2]) {
     if (pipe(pipeHolder) == -1) {
-	fprintf(stderr, "error: error in creating pipe");
-	exit(1);
+        fprintf(stderr, "error: error in creating pipe");
+        exit(1);
     }
 }
 
@@ -96,51 +96,53 @@ void readWriteShell(int fd1, int fd2) {
     char buffer;
 
     while (1) {
-	// do a polli and check for errors
-	returnValue = poll(pollfdArray, 2, 0);
-	/*if (returnValue < 0) {
-	    fprintf(stderr, "error: error while polling\n");
-	    exit(1);
-	}*/
-	
-	// if keyboard pollfd revents has POLLIN (has input to read)
-	if ((pollfdArray[0].revents & POLLIN)) {
-	    int bytesRead = read(fd1, &buffer, sizeof(char)); // read from keyboard
-	    if (buffer == '\r' || buffer == '\n') {
-		char tempBuffer[2] = {'\r', '\n'};
-		char shellBuffer[1] = {'\n'};
-		write(fd2, &tempBuffer, 2*sizeof(char));
-		write(pipeToChild[1], &shellBuffer, sizeof(char));
-		continue;
-	    }
-	    else if (buffer == 0x04) {
-		close(pipeToChild[1]);
-	    }
-	    else if (buffer == 0x03) {
-	    	kill(pid, SIGINT);
-	    }
-	    else {
-	        write(fd2, &buffer, sizeof(char));
-	        write(pipeToChild[1], &buffer, sizeof(char));
-	    }
-	}
+        // do a polli and check for errors
+        returnValue = poll(pollfdArray, 2, 0);
+        if (returnValue < 0) {
+            fprintf(stderr, "error: error while polling\n");
+            exit(1);
+        }
 
-	// if shell pollfd has POLLIN (has output to read)
-	if ((pollfdArray[1].revents & POLLIN)) {
-	    int bytesRead = read(pipeToParent[0], &buffer, sizeof(char)); // read from shell pipe
-	    if (buffer == '\n') {
-		char tempBuffer[2] = {'\r', '\n'};
-		write(1, &tempBuffer, 2*sizeof(char));
-		continue;
-	    }
-	    else {
-		write(1, &buffer, sizeof(char));
-	    }
-	}
+        // if keyboard pollfd revents has POLLIN (has input to read)
+        if ((pollfdArray[0].revents & POLLIN)) {
+            int bytesRead = read(fd1, &buffer, sizeof(char)); // read from keyboard
 
-	if ((pollfdArray[1].revents & (POLLHUP | POLLERR))) {
-	    exit(0);    
-	}
+            if (buffer == '\r' || buffer == '\n') {
+        		char tempBuffer[2] = {'\r', '\n'};
+        		char shellBuffer[1] = {'\n'};
+        		write(fd2, &tempBuffer, 2*sizeof(char));
+        		write(pipeToChild[1], &shellBuffer, sizeof(char));
+        		continue;
+            }
+            else if (buffer == 0x04) {
+                close(pipeToChild[1]);
+            }
+            else if (buffer == 0x03) {
+                kill(pid, SIGINT);
+            }
+            else {
+                write(fd2, &buffer, sizeof(char));
+                write(pipeToChild[1], &buffer, sizeof(char));
+            }
+        }
+
+        // if shell pollfd has POLLIN (has output to read)
+        if ((pollfdArray[1].revents & POLLIN)) {
+            int bytesRead = read(pipeToParent[0], &buffer, sizeof(char)); // read from shell pipe
+
+            if (buffer == '\n') {
+                char tempBuffer[2] = {'\r', '\n'};
+                write(1, &tempBuffer, 2*sizeof(char));
+                continue;
+            }
+            else {
+                write(1, &buffer, sizeof(char));
+            }
+        }
+
+    	if ((pollfdArray[1].revents & (POLLHUP | POLLERR))) {
+    	    exit(0);
+    	}
     }
 }
 
@@ -148,19 +150,19 @@ void readWrite(fd1, fd2) {
     char buffer2;
     while (read(0, &buffer2, sizeof(char))) {
     	// if receive ^D, exit
-	if (buffer2 == '\004') {
-	    exit(0);
-	}
-	// receiving \r or \n
-	else if (buffer2 == '\r' || buffer2 == '\n') {
-	    char tempBuffer[2] = {'\r', '\n'};
-	    // should echo as <cr><lf>
-	    write(1, &tempBuffer, 2*sizeof(char));
-	    continue;
-	}
-	else {
-	    write(1, &buffer2, sizeof(char));
-	}
+        if (buffer2 == '\004') {
+            exit(0);
+        }
+        // receiving \r or \n
+        else if (buffer2 == '\r' || buffer2 == '\n') {
+            char tempBuffer[2] = {'\r', '\n'};
+            // should echo as <cr><lf>
+            write(1, &tempBuffer, 2*sizeof(char));
+            continue;
+        }
+        else {
+            write(1, &buffer2, sizeof(char));
+        }
     }
 }
 
@@ -170,68 +172,67 @@ int main(int argc, char **argv) {
 
     // arguments that this program recognizes
     static struct option options[] = {
-    	{"shell", no_argument, 0, 's'},
-	{0, 0, 0, 0}
+    	{"shell", no_argument, 0, 's'}
     };
 
     while ((option = getopt_long(argc, argv, "s", options, NULL)) != -1) {
-	switch (option) {
-	    case 's':
-		signal(SIGINT, signalHandler);
-		signal(SIGPIPE, signalHandler); 
-		shellFlag = 1;
-		break;
-	    default:
-		fprintf(stderr, "error: unrecognized argument\nrecognized arguments:\n--shell\n");
-		exit(1);
-	}
+        switch (option) {
+            case 's':
+            	signal(SIGINT, signalHandler);
+            	signal(SIGPIPE, signalHandler);
+            	shellFlag = 1;
+            	break;
+            default:
+            	fprintf(stderr, "error: unrecognized argument\nrecognized arguments:\n--shell\n");
+            	exit(1);
+        }
     }
 
     // set input mode to non-canonical no echo
     setInputMode();
-    
+
     // create pipes
     createPipe(pipeToChild);
     createPipe(pipeToParent);
 
     // if shell flag, fork process
     if (shellFlag) {
-	pid = fork();
-	// fork failed
-	if (pid == -1) {
-	    fprintf(stderr, "error: error in forking process");
-	    exit(1);
-	}
-	// child process
-	else if (pid == 0) {
-	    // pipe reconnection for child process
-	    close(pipeToChild[1]);
-	    close(pipeToParent[0]);
-	    dup2(pipeToChild[0], STDIN_FILENO);
-	    dup2(pipeToParent[1], STDOUT_FILENO);
-	    close(pipeToChild[0]);
-	    close(pipeToParent[1]);
-	    
-	    // format arguments for shell
-	    char *execvp_argv[2];
-	    char execvp_filename[] = "/bin/bash";
-	    execvp_argv[0] = execvp_filename;
-	    execvp_argv[1] = NULL;
+    	pid = fork();
+    	if (pid == -1) {
+    	    fprintf(stderr, "error: error in forking process");
+    	    exit(1);
+    	}
 
-	    // execute shell with it's filename as an argument
-	    if (execvp(execvp_filename, execvp_argv) == -1) {
-		fprintf(stderr, "error: error in executing shell");
-		exit(1);
-	    }
-	}
-	// parent process
-	else {
-	    // pipe reconnection for parent process
-	    close(pipeToChild[0]);
-	    close(pipeToParent[1]);
+    	// child process
+    	else if (pid == 0) {
+    	    // pipe reconnection for child process
+    	    close(pipeToChild[1]);
+    	    close(pipeToParent[0]);
+    	    dup2(pipeToChild[0], STDIN_FILENO);
+    	    dup2(pipeToParent[1], STDOUT_FILENO);
+    	    close(pipeToChild[0]);
+    	    close(pipeToParent[1]);
 
-	    readWriteShell(0, 1);
-	}
+    	    // format arguments for shell
+    	    char *execvp_argv[2];
+    	    char execvp_filename[] = "/bin/bash";
+    	    execvp_argv[0] = execvp_filename;
+    	    execvp_argv[1] = NULL;
+
+    	    // execute shell with it's filename as an argument
+    	    if (execvp(execvp_filename, execvp_argv) == -1) {
+        		fprintf(stderr, "error: error in executing shell");
+        		exit(1);
+    	    }
+    	}
+    	// parent process
+    	else {
+    	    // pipe reconnection for parent process
+    	    close(pipeToChild[0]);
+    	    close(pipeToParent[1]);
+
+    	    readWriteShell(0, 1);
+    	}
     }
 
     // if no shell flag, just do usual readWrite from stdin to stdout

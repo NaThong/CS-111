@@ -218,7 +218,7 @@ def runAudits(summary):
 
     except IOError as e:
         sys.stderr.write('error: unable to open file\n')
-	exit(1)
+        exit(1)
 
 def main():
     # requires at least one argument

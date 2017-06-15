@@ -34,7 +34,7 @@ void deinitializeEncryption() {
     // DEINIT ENCRYPTIONG
     mcrypt_generic_deinit(cryptFD);
     mcrypt_module_close(cryptFD);
-    
+
     // DEINIT DECRYPTIONG
     mcrypt_generic_deinit(decryptFD);
     mcrypt_module_close(decryptFD);
@@ -116,7 +116,7 @@ void execShell() {
     dup2(pipeToParent[1], STDERR_FILENO);
     close(pipeToChild[0]);
     close(pipeToParent[1]);
-    
+
     // format arguments for shell
     char *execvp_argv[2];
     char execvp_filename[] = "/bin/bash";
@@ -147,9 +147,9 @@ void shutdownServer(int eof) {
     if (WIFEXITED(status)) {
         const int es = WEXITSTATUS(status);
         const int ss = WTERMSIG(status);
-	if (eof) {
-            fprintf(stderr, "SHELL EXIT SIGNAL=%d STATUS=%d\n", ss, es);
-	}
+        if (eof) {
+                fprintf(stderr, "SHELL EXIT SIGNAL=%d STATUS=%d\n", ss, es);
+        }
         exit(0);
     }
 }
@@ -171,13 +171,13 @@ void readWrite(int socketFD) {
             fprintf(stderr, "error: error while polling\n");
             exit(1);
         }
-        
+
         // if socketFD pollfd revents has POLLIN (has input to read)
         if ((pollfdArray[0].revents & POLLIN)) {
             int bytesRead = read(socketFD, &buffer, sizeof(char)); // read from socketFD
             if (encryptFlag) { decrypt(&buffer, 1); } // if encryptFlag, decrypt socket data
             if (buffer == '\003') {
-		shutdownServer(0);
+                shutdownServer(0);
             }
             if (buffer == '\004') {
                 shutdownServer(1);
@@ -199,7 +199,7 @@ void readWrite(int socketFD) {
 
         if ((pollfdArray[1].revents & (POLLHUP | POLLERR))) {
             fprintf(stderr, "error: received POLLHUP|POLLERR\n");
-            exit(0);    
+            exit(0);
         }
     }
 }
@@ -257,8 +257,8 @@ int main(int argc, char *argv[]) {
     // accept connection from client
     newSocketFD = accept(socketFD, (struct sockaddr *) &clientAddress, &clientLength);
     if (newSocketFD < 0) {
-	fprintf(stderr, "error: error accepting client");
-	exit(1);
+        fprintf(stderr, "error: error accepting client");
+        exit(1);
     }
 
     // create pipes

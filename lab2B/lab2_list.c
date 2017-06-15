@@ -37,13 +37,13 @@ char* getTestTag() {
     // append proper yield tag
     if (strlen(yieldString) == 0) { strcat(returnString, "-none"); }
     else {
-	strcat(returnString, "-");
-	int k = 0;
-	for (k = 0; *(yieldString + k) != '\0'; k++) {
-	    if (*(yieldString + k) == 'i') { strcat(returnString, "i"); }
-	    else if (*(yieldString + k) == 'd') { strcat(returnString, "d"); }
-	    else if (*(yieldString + k) == 'l') { strcat(returnString, "l"); }
-	}
+    	strcat(returnString, "-");
+    	int k = 0;
+    	for (k = 0; *(yieldString + k) != '\0'; k++) {
+    	    if (*(yieldString + k) == 'i') { strcat(returnString, "i"); }
+    	    else if (*(yieldString + k) == 'd') { strcat(returnString, "d"); }
+    	    else if (*(yieldString + k) == 'l') { strcat(returnString, "l"); }
+    	}
     }
 
     // append proper sync tag
@@ -80,7 +80,7 @@ void setYieldOption(char* yieldOptions) {
 
 // hash function
 int hash(const char* key) {
-  return (key[0] % numLists);
+    return (key[0] % numLists);
 }
 
 // generates random keys and place them into elements
@@ -110,21 +110,21 @@ void* listOperations(void* threadIndex) {
     for (k= *(int*)threadIndex; k < totalElements; k += numThreads) {
     	switch (syncOption) {
     	    case 'm':
-          		if (clock_gettime(CLOCK_MONOTONIC, &lockWaitStart) == -1) { fprintf(stderr, "error: error in getting start time\n"); exit(1); }
-    		      pthread_mutex_lock(&mutexArray[listNumber[k]]);
-        		  if (clock_gettime(CLOCK_MONOTONIC, &lockWaitEnd) == -1) { fprintf(stderr, "error: error in getting stop time\n"); exit(1); }
-        		  lockWaitTime += BILL * (lockWaitEnd.tv_sec - lockWaitStart.tv_sec) + (lockWaitEnd.tv_nsec - lockWaitStart.tv_nsec);
+                if (clock_gettime(CLOCK_MONOTONIC, &lockWaitStart) == -1) { fprintf(stderr, "error: error in getting start time\n"); exit(1); }
+                pthread_mutex_lock(&mutexArray[listNumber[k]]);
+                if (clock_gettime(CLOCK_MONOTONIC, &lockWaitEnd) == -1) { fprintf(stderr, "error: error in getting stop time\n"); exit(1); }
+                lockWaitTime += BILL * (lockWaitEnd.tv_sec - lockWaitStart.tv_sec) + (lockWaitEnd.tv_nsec - lockWaitStart.tv_nsec);
           		SortedList_insert(&listArray[listNumber[k]], &elementList[k]);
           		pthread_mutex_unlock(&mutexArray[listNumber[k]]);
           		break;
     	    case 's':
-              if (clock_gettime(CLOCK_MONOTONIC, &lockWaitStart) == -1) { fprintf(stderr, "error: error in getting start time\n"); exit(1); }
-          		while(__sync_lock_test_and_set(&spinArray[listNumber[k]], 1));
-              if (clock_gettime(CLOCK_MONOTONIC, &lockWaitEnd) == -1) { fprintf(stderr, "error: error in getting stop time\n"); exit(1); }
-        		  lockWaitTime += BILL * (lockWaitEnd.tv_sec - lockWaitStart.tv_sec) + (lockWaitEnd.tv_nsec - lockWaitStart.tv_nsec);
-          		SortedList_insert(&listArray[listNumber[k]], &elementList[k]);
-          		__sync_lock_release(&spinArray[listNumber[k]]);
-          		break;
+                if (clock_gettime(CLOCK_MONOTONIC, &lockWaitStart) == -1) { fprintf(stderr, "error: error in getting start time\n"); exit(1); }
+                while(__sync_lock_test_and_set(&spinArray[listNumber[k]], 1));
+                if (clock_gettime(CLOCK_MONOTONIC, &lockWaitEnd) == -1) { fprintf(stderr, "error: error in getting stop time\n"); exit(1); }
+                lockWaitTime += BILL * (lockWaitEnd.tv_sec - lockWaitStart.tv_sec) + (lockWaitEnd.tv_nsec - lockWaitStart.tv_nsec);
+                SortedList_insert(&listArray[listNumber[k]], &elementList[k]);
+                __sync_lock_release(&spinArray[listNumber[k]]);
+                break;
     	    default:
           		SortedList_insert(&listArray[listNumber[k]], &elementList[k]);
           		break;
@@ -135,98 +135,98 @@ void* listOperations(void* threadIndex) {
     int length = 0;
     switch (syncOption) {
     	case 'm':
-          for(k = 0; k < numLists; k++) {
-      	    if (clock_gettime(CLOCK_MONOTONIC, &lockWaitStart) == -1) { fprintf(stderr, "error: error in getting start time\n"); exit(1); }
-      	    pthread_mutex_lock(&mutexArray[k]);
-      	    if (clock_gettime(CLOCK_MONOTONIC, &lockWaitEnd) == -1) { fprintf(stderr, "error: error in getting stop time\n"); exit(1); }
-            lockWaitTime += BILL * (lockWaitEnd.tv_sec - lockWaitStart.tv_sec) + (lockWaitEnd.tv_nsec - lockWaitStart.tv_nsec);
-            int tempLength = SortedList_length(&listArray[k]);
-      	    if (tempLength == -1) {
-              	fprintf(stderr, "error: failed to get length of list\n");
-              	exit(2);
-      	    }
-            else
-              length += tempLength;
-      	    pthread_mutex_unlock(&mutexArray[k]);
-          }
+            for(k = 0; k < numLists; k++) {
+                if (clock_gettime(CLOCK_MONOTONIC, &lockWaitStart) == -1) { fprintf(stderr, "error: error in getting start time\n"); exit(1); }
+                pthread_mutex_lock(&mutexArray[k]);
+                if (clock_gettime(CLOCK_MONOTONIC, &lockWaitEnd) == -1) { fprintf(stderr, "error: error in getting stop time\n"); exit(1); }
+                lockWaitTime += BILL * (lockWaitEnd.tv_sec - lockWaitStart.tv_sec) + (lockWaitEnd.tv_nsec - lockWaitStart.tv_nsec);
+                int tempLength = SortedList_length(&listArray[k]);
+                if (tempLength == -1) {
+                	fprintf(stderr, "error: failed to get length of list\n");
+                	exit(2);
+                }
+                else
+                    length += tempLength;
+                pthread_mutex_unlock(&mutexArray[k]);
+            }
     	    break;
     	case 's':
-          for (k = 0; k < numLists; k++) {
-            if (clock_gettime(CLOCK_MONOTONIC, &lockWaitStart) == -1) { fprintf(stderr, "error: error in getting start time\n"); exit(1); }
-      	    while (__sync_lock_test_and_set(&spinArray[k], 1));
-            if (clock_gettime(CLOCK_MONOTONIC, &lockWaitEnd) == -1) { fprintf(stderr, "error: error in getting stop time\n"); exit(1); }
-            lockWaitTime += BILL * (lockWaitEnd.tv_sec - lockWaitStart.tv_sec) + (lockWaitEnd.tv_nsec - lockWaitStart.tv_nsec);
-            int tempLength = SortedList_length(&listArray[k]);
-      	    if (tempLength == -1) {
-          		fprintf(stderr, "error: failed to get length of list\n");
-          		exit(2);
-      	    }
-            else
-              length += tempLength;
-      	    __sync_lock_release(&spinArray[k]);
-          }
-    	    break;
+            for (k = 0; k < numLists; k++) {
+                if (clock_gettime(CLOCK_MONOTONIC, &lockWaitStart) == -1) { fprintf(stderr, "error: error in getting start time\n"); exit(1); }
+                while (__sync_lock_test_and_set(&spinArray[k], 1));
+                if (clock_gettime(CLOCK_MONOTONIC, &lockWaitEnd) == -1) { fprintf(stderr, "error: error in getting stop time\n"); exit(1); }
+                lockWaitTime += BILL * (lockWaitEnd.tv_sec - lockWaitStart.tv_sec) + (lockWaitEnd.tv_nsec - lockWaitStart.tv_nsec);
+                int tempLength = SortedList_length(&listArray[k]);
+                if (tempLength == -1) {
+                    fprintf(stderr, "error: failed to get length of list\n");
+                    exit(2);
+                }
+                else
+                    length += tempLength;
+                __sync_lock_release(&spinArray[k]);
+            }
+            break;
     	default:
-          for (k = 0; k < numLists; k++) {
-            int tempLength = SortedList_length(&listArray[k]);
-      	    if (tempLength == -1) {
-          		fprintf(stderr, "error: failed to get length of list\n");
-          		exit(2);
-      	    }
-            else
-              length += tempLength;
-          }
-    	    break;
+            for (k = 0; k < numLists; k++) {
+                int tempLength = SortedList_length(&listArray[k]);
+                if (tempLength == -1) {
+                    fprintf(stderr, "error: failed to get length of list\n");
+                    exit(2);
+                }
+                else
+                    length += tempLength;
+            }
+            break;
     }
 
     // lookup and delete previously inserted elements within sublists
     SortedListElement_t *temp = NULL;
     for (k = *(int*)threadIndex; k < totalElements; k += numThreads) {
-      switch (syncOption) {
-        case 'm':
-          if (clock_gettime(CLOCK_MONOTONIC, &lockWaitStart) == -1) { fprintf(stderr, "error: error in getting start time\n"); exit(1); }
-          pthread_mutex_lock(&mutexArray[listNumber[k]]);
-          if (clock_gettime(CLOCK_MONOTONIC, &lockWaitEnd) == -1) { fprintf(stderr, "error: error in getting stop time\n"); exit(1); }
-          lockWaitTime += BILL * (lockWaitEnd.tv_sec - lockWaitStart.tv_sec) + (lockWaitEnd.tv_nsec - lockWaitStart.tv_nsec);
-          temp = SortedList_lookup(&listArray[listNumber[k]], elementList[k].key);
-          if (temp == NULL) {
-              fprintf(stderr, "error: failed to find element we already inserted\n");
-              exit(2);
-          }
-          if (SortedList_delete(temp)) {
-              fprintf(stderr, "error: failed to delete an element we already inserted\n");
-              exit(2);
-          }
-          pthread_mutex_unlock(&mutexArray[listNumber[k]]);
-          break;
-        case 's':
-          if (clock_gettime(CLOCK_MONOTONIC, &lockWaitStart) == -1) { fprintf(stderr, "error: error in getting start time\n"); exit(1); }
-          while (__sync_lock_test_and_set(&spinArray[listNumber[k]], 1));
-          if (clock_gettime(CLOCK_MONOTONIC, &lockWaitEnd) == -1) { fprintf(stderr, "error: error in getting stop time\n"); exit(1); }
-          lockWaitTime += BILL * (lockWaitEnd.tv_sec - lockWaitStart.tv_sec) + (lockWaitEnd.tv_nsec - lockWaitStart.tv_nsec);
-          temp = SortedList_lookup(&listArray[listNumber[k]], elementList[k].key);
-          if (temp == NULL) {
-              fprintf(stderr, "error: failed to find element we already inserted\n");
-              exit(2);
-          }
-          if (SortedList_delete(temp)) {
-              fprintf(stderr, "error: failed to delete an element we already inserted\n");
-              exit(2);
-          }
-          __sync_lock_release(&spinArray[listNumber[k]]);
-          break;
-        default:
-          temp = SortedList_lookup(&listArray[listNumber[k]], elementList[k].key);
-          if (temp == NULL) {
-              fprintf(stderr, "error: failed to find element we already inserted\n");
-              exit(2);
-          }
-          if (SortedList_delete(temp)) {
-              fprintf(stderr, "error: failed to delete an element we already inserted\n");
-              exit(2);
-          }
-	        break;
-      }
+        switch (syncOption) {
+            case 'm':
+                if (clock_gettime(CLOCK_MONOTONIC, &lockWaitStart) == -1) { fprintf(stderr, "error: error in getting start time\n"); exit(1); }
+                pthread_mutex_lock(&mutexArray[listNumber[k]]);
+                if (clock_gettime(CLOCK_MONOTONIC, &lockWaitEnd) == -1) { fprintf(stderr, "error: error in getting stop time\n"); exit(1); }
+                lockWaitTime += BILL * (lockWaitEnd.tv_sec - lockWaitStart.tv_sec) + (lockWaitEnd.tv_nsec - lockWaitStart.tv_nsec);
+                temp = SortedList_lookup(&listArray[listNumber[k]], elementList[k].key);
+                if (temp == NULL) {
+                    fprintf(stderr, "error: failed to find element we already inserted\n");
+                    exit(2);
+                }
+                if (SortedList_delete(temp)) {
+                    fprintf(stderr, "error: failed to delete an element we already inserted\n");
+                    exit(2);
+                }
+                pthread_mutex_unlock(&mutexArray[listNumber[k]]);
+                break;
+            case 's':
+                if (clock_gettime(CLOCK_MONOTONIC, &lockWaitStart) == -1) { fprintf(stderr, "error: error in getting start time\n"); exit(1); }
+                while (__sync_lock_test_and_set(&spinArray[listNumber[k]], 1));
+                if (clock_gettime(CLOCK_MONOTONIC, &lockWaitEnd) == -1) { fprintf(stderr, "error: error in getting stop time\n"); exit(1); }
+                lockWaitTime += BILL * (lockWaitEnd.tv_sec - lockWaitStart.tv_sec) + (lockWaitEnd.tv_nsec - lockWaitStart.tv_nsec);
+                temp = SortedList_lookup(&listArray[listNumber[k]], elementList[k].key);
+                if (temp == NULL) {
+                    fprintf(stderr, "error: failed to find element we already inserted\n");
+                    exit(2);
+                }
+                if (SortedList_delete(temp)) {
+                    fprintf(stderr, "error: failed to delete an element we already inserted\n");
+                    exit(2);
+                }
+                __sync_lock_release(&spinArray[listNumber[k]]);
+                break;
+            default:
+                temp = SortedList_lookup(&listArray[listNumber[k]], elementList[k].key);
+                if (temp == NULL) {
+                    fprintf(stderr, "error: failed to find element we already inserted\n");
+                    exit(2);
+                }
+                if (SortedList_delete(temp)) {
+                    fprintf(stderr, "error: failed to delete an element we already inserted\n");
+                    exit(2);
+                }
+                break;
+        }
     }
 
     return NULL;
@@ -246,16 +246,16 @@ void initializeLists() {
 // function that initializes locks for the sublists
 void initializeLocks() {
     if (syncOption == 'm') {
-      mutexArray = malloc(numLists * sizeof(pthread_mutex_t));
-      int k;
-      for (k = 0; k < numLists; k++)
-        pthread_mutex_init(&mutexArray[k], NULL);
+        mutexArray = malloc(numLists * sizeof(pthread_mutex_t));
+        int k;
+        for (k = 0; k < numLists; k++)
+            pthread_mutex_init(&mutexArray[k], NULL);
     }
     else if (syncOption == 's') {
-      spinArray = malloc(numLists * sizeof(int));
-      int k;
-      for (k = 0; k < numLists; k++)
-        spinArray[k] = 0;
+        spinArray = malloc(numLists * sizeof(int));
+        int k;
+        for (k = 0; k < numLists; k++)
+            spinArray[k] = 0;
     }
 }
 
@@ -316,7 +316,7 @@ int main(int argc, char **argv) {
     listNumber = malloc(totalElements * sizeof(int));
     int m;
     for (m = 0; m < totalElements; m++)
-      listNumber[m] = hash(elementList[m].key);
+        listNumber[m] = hash(elementList[m].key);
 
     // creates the number of specified threads
     pthread_t *threads = malloc(numThreads * sizeof(pthread_t));

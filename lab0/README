@@ -5,7 +5,7 @@ ID: 004611638
 Included Files:
 
 lab0.c - C program that copies its stdin to its stdout. Supports all options
-including --intput, --output, --segfault, and --catch.
+including --input, --output, --segfault, and --catch.
 
 Makefile - Makefile that builds the lab0 executable. Supports a check target
 that runs the smoke test on the lab0 program, a clean target that removes
@@ -40,8 +40,3 @@ exits with code 4.
 
 cmpTest - runs lab0 with valid input, then checks if input and output files
 are the same using the cmp command and checking if the exit code was 0.
-
-Resources:
-
-Example used to understand the getopt_long API
-https://www.gnu.org/software/libc/manual/html_node/Getopt-Long-Option-Example.html

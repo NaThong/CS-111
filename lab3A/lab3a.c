@@ -90,28 +90,23 @@ void groupSummary() {
     int STARTOFFSET = SUPEROFF + BLOCKSIZE;
 
 	int i;
-	for(i = 0; i < groupCount; i++)
-    {
+	for(i = 0; i < groupCount; i++) {
         //group number
         dprintf(outFD, "GROUP,%d,", i);
 
 		// Number of blocks in group
-		if(i != groupCount - 1 || blockRem == 0)
-        {
+		if(i != groupCount - 1 || blockRem == 0) {
 			dprintf(outFD, "%d,", superSum.s_blocks_per_group);
 		}
-		else
-        {
+		else {
 			dprintf(outFD, "%d,", blockRem);
 		}
 
         // Number of inodes in group
-		if(i != groupCount - 1 || inodeRem == 0)
-        {
+		if(i != groupCount - 1 || inodeRem == 0) {
 			dprintf(outFD, "%d,", superSum.s_inodes_per_group);
 		}
-		else
-        {
+		else {
 			dprintf(outFD, "%d,", inodeRem);
 		}
 
@@ -137,49 +132,39 @@ void groupSummary() {
 void blockEntries() {
     int i;
     //for each group
-	for(i = 0; i < groupCount; i++)
-    {
+	for(i = 0; i < groupCount; i++) {
 		int j;
         //for each block in group
-		for(j = 0; j < (1024 << superSum.s_log_block_size); j++)
-        {
+		for(j = 0; j < (1024 << superSum.s_log_block_size); j++) {
 			pread(imageFD, &i8, 1, groupSum[i].bg_block_bitmap*(1024 << superSum.s_log_block_size) + j);
 
 			int k;
-			for(k = 0; k < 8; k++)
-            {
-				if((i8 & (1 << k)) == 0)
-                {
+			for(k = 0; k < 8; k++) {
+				if((i8 & (1 << k)) == 0) {
 					dprintf(outFD, "BFREE,%d\n", (i*superSum.s_blocks_per_group) + (j*8) + (k+1));
 				}
 			}
 		}
     }
-
 }
 
 void inodeEntries() {
     int i;
     //for each group
-	for(i = 0; i < groupCount; i++)
-    {
+	for(i = 0; i < groupCount; i++) {
 		int j;
         //for each block in group
-		for(j = 0; j < (1024 << superSum.s_log_block_size); j++)
-        {
+		for(j = 0; j < (1024 << superSum.s_log_block_size); j++) {
 			pread(imageFD, &i8, 1, groupSum[i].bg_inode_bitmap*(1024 << superSum.s_log_block_size) + j);
 
 			int k;
-			for(k = 0; k < 8; k++)
-            {
-				if((i8 & (1 << k)) == 0)
-                {
+			for(k = 0; k < 8; k++) {
+				if((i8 & (1 << k)) == 0) {
 					dprintf(outFD, "IFREE,%d\n", (i*superSum.s_inodes_per_group) + (j*8) + (k+1));
 				}
 			}
 		}
     }
-
 }
 
 void processDirectory(struct ext2_dir_entry directory, int parentInodeNumber, int logicalByteOffset) {
@@ -245,8 +230,7 @@ void inodeSummary() {
                 // process DIRENTS
                 struct ext2_dir_entry directory;
                 if (fileType == 'd' || fileType == 'f') {
-                    if(fileType == 'd')
-                    {
+                    if(fileType == 'd') {
                         for (j = 0; j < EXT2_NDIR_BLOCKS; j++) {
                             if (localInode.i_block[j] == 0) break; // NULL - no more
 
@@ -265,30 +249,24 @@ void inodeSummary() {
                     int* doublePointerArr = malloc(BLOCKSIZE);
                     int* triplePointerArr = malloc(BLOCKSIZE);
 
-                    if(localInode.i_block[12] > 0)
-                    {
+                    if(localInode.i_block[12] > 0) {
 
                         pread(imageFD, pointerArr, BLOCKSIZE, localInode.i_block[12]*BLOCKSIZE);
                         int i;
-                        for(i = 0; i < BLOCKSIZE/4; i++)
-                        {
+                        for(i = 0; i < BLOCKSIZE/4; i++) {
                             if(pointerArr[i]==0)
                                 break;
 
                             int directoryEntryOffset = pointerArr[i]*BLOCKSIZE;
                             int currOffset = 0;
 
-                            while (currOffset < BLOCKSIZE)
-                            {
+                            while (currOffset < BLOCKSIZE) {
                                 pread(imageFD, &directory, sizeof(struct ext2_dir_entry), directoryEntryOffset + currOffset);
 
                                 processIndirectory(directory, m + 1, 12 + i, 1, localInode.i_block[12], i + 1);
                                 currOffset += directory.rec_len;
                             }
-
                         }
-
-
                     }
 
                     // DOUBLE INDIRECT
@@ -392,8 +370,7 @@ int main(int argc, char **argv) {
     int fd = open("./summary.csv", O_RDONLY);
     char buf[1024];
     int len;
-    while((len = read(fd, buf, 1024)) > 0)
-    {
+    while((len = read(fd, buf, 1024)) > 0) {
         write(1, buf, len);
     }
     close(fd);

@@ -32,7 +32,7 @@ void deinitializeEncryption() {
     // DEINIT ENCRYPTIONG
     mcrypt_generic_deinit(cryptFD);
     mcrypt_module_close(cryptFD);
-    
+
     // DEINIT DECRYPTIONG
     mcrypt_generic_deinit(decryptFD);
     mcrypt_module_close(decryptFD);
@@ -144,12 +144,12 @@ void readWrite(socketFD) {
             fprintf(stderr, "error: error while polling\n");
             exit(1);
         }
-        
+
         // if keyboard pollfd revents has POLLIN (has input to read)
         if ((pollfdArray[0].revents & POLLIN)) {
             int bytesRead = read(0, &buffer, sizeof(char)); // read from keyboard
             if (buffer == '\r' || buffer == '\n') {
-                char tempBuffer[2] = {'\r','\n'};	
+                char tempBuffer[2] = {'\r','\n'};
                 write(1, &tempBuffer, 2*sizeof(char));
                 if (encryptFlag) { encrypt(&buffer, 1); }
                 if (logFlag) {
@@ -184,15 +184,13 @@ void readWrite(socketFD) {
                 write(1, &tempBuffer, 2*sizeof(char));
                 continue;
             }
-	    /*if (buffer == '\004') {
-		exit(0);
-	    }*/
+
             write(1, &buffer, sizeof(char));                        // write to screen
         }
 
         // error checking from socket pollFD
         if ((pollfdArray[1].revents & (POLLHUP | POLLERR))) {
-	    exit(0);    
+            exit(0);
         }
     }
 }
@@ -206,8 +204,7 @@ int main(int argc, char *argv[]) {
     static struct option options[] = {
     	{"port", required_argument, 0, 'p'},
         {"log", required_argument, 0, 'l'},
-        {"encrypt", required_argument, 0, 'e'},
-        {0, 0, 0, 0}
+        {"encrypt", required_argument, 0, 'e'}
     };
 
     // parse through arguments
@@ -262,4 +259,3 @@ int main(int argc, char *argv[]) {
 
     exit(0);
 }
-

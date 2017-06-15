@@ -124,10 +124,10 @@ void* listOperations(void* threadIndex) {
             __sync_lock_release(&spinCondition);
             break;
         default:
-        if (SortedList_length(list) == -1) {
-            fprintf(stderr, "error: failed to get length of list\n");
-            exit(2);
-        }
+            if (SortedList_length(list) == -1) {
+                fprintf(stderr, "error: failed to get length of list\n");
+                exit(2);
+            }
     }
 
     // lookup and delete previously inserted elements
@@ -209,7 +209,7 @@ int main(int argc, char **argv) {
                     fprintf(stderr, "error: unrecognized sync argument. recognized arguments: [ms]\n");
                     exit(1);
                 }
-		break;
+                break;
             default:
                 fprintf(stderr, "error: unrecognized argument\nreocgnized arguments:\n--threads=#\n--iterations=#\n--yield=[idl]\n--sync=[ms]\n");
                 exit(1);

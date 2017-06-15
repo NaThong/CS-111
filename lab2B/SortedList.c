@@ -2,13 +2,12 @@
 // EMAIL: jeffschan97@gmail.com
 // ID: 004-611638
 
-#include "SortedList.h"
-#include <pthread.h>
-#include <string.h>
+#include"SortedList.h"
+#include<pthread.h>
+#include<string.h>
 #include<stdlib.h>
 
-void SortedList_insert(SortedList_t *list, SortedListElement_t *element)
-{
+void SortedList_insert(SortedList_t *list, SortedListElement_t *element) {
 	if(list == NULL || element == NULL) { return; } // check for invalid arugments
 	SortedListElement_t *curr = list->next;
 
@@ -28,8 +27,7 @@ void SortedList_insert(SortedList_t *list, SortedListElement_t *element)
 	curr->prev = element;
 }
 
-int SortedList_delete(SortedListElement_t *element)
-{
+int SortedList_delete(SortedListElement_t *element) {
 	if(element == NULL) { return 1; } // invalid arguments
 
 	// check if pointers are corrupted, then try to delete element
@@ -45,17 +43,16 @@ int SortedList_delete(SortedListElement_t *element)
 	return 1; // failure to delete element
 }
 
-SortedListElement_t *SortedList_lookup(SortedList_t *list, const char *key)
-{
+SortedListElement_t *SortedList_lookup(SortedList_t *list, const char *key) {
 	if(list == NULL || key == NULL) { return NULL; } // invalid arguments
 	SortedListElement_t *curr = list->next;
 
 	// iterate through list and try to find element
 	while(curr != list) {
 		if(strcmp(curr->key, key) == 0) return curr;
-		
+
 		if(opt_yield & LOOKUP_YIELD) sched_yield();
-		
+
 		curr = curr->next;
 	}
 
@@ -67,14 +64,13 @@ int SortedList_length(SortedList_t* list) {
 	SortedListElement_t *curr = list->next;
 
 	int count = 0;
-	while(curr != list)
-	{
+	while(curr != list) {
 		count++;
 
 		if(opt_yield & LOOKUP_YIELD) sched_yield();
-		
+
 		curr = curr->next;
 	}
-	
+
 	return count;
 }
