@@ -231,27 +231,27 @@ int main(int argc, char **argv) {
 				exit(1);
 			}
 
+			// if there's input, handle it
 			if ((pollfdArray[0].revents & POLLIN)) {
-
-                FILE* fdf = fdopen(socketFD, "r");
-      			char commBuff[1024];
-    			char c;
-    			int buffIndex = 0;
-    	  		while (1) {
-    				if(read(socketFD, &c, 1) > 0) {
-    					if (c == '\n') {
-    						commBuff[buffIndex] = '\0';
-    						buffIndex = 0;
-    						break;
-    					}
-    					commBuff[buffIndex] = c;
-    					buffIndex++;
-    				}
-    			}
-                handleCommand(commBuff);
+				FILE* fdf = fdopen(socketFD, "r");
+				char commBuff[1024];
+				char c;
+				int buffIndex = 0;
+				while (1) {
+					if(read(socketFD, &c, 1) > 0) {
+						if (c == '\n') {
+							commBuff[buffIndex] = '\0';
+							buffIndex = 0;
+							break;
+						}
+						commBuff[buffIndex] = c;
+						buffIndex++;
+					}
+				}
+				handleCommand(commBuff);
 			}
-			if (run)
-				time(&end); // sample new ending time
+			
+			if (run) time(&end); // sample new ending time
 		}
 	}
 

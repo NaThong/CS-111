@@ -2,6 +2,14 @@
 
 My solutions for [UCLA CS 111 - Operating Systems Principles](http://web.cs.ucla.edu/classes/spring17/cs111/) taught by [Mark Kampe](https://www.linkedin.com/in/markkampe) in Spring 2017.
 
+Project | Score | Project | Score
+---- | ---- | ---- | ----
+Lab 0 | 99 / 100 |  Lab 3A |
+Lab 1A | 96 / 100 | Lab 3B |
+Lab 1B | 89 / 100 | Lab 4A | 100 / 100
+Lab 2A | 90 / 100 | Lab 4B | 95 / 100
+Lab 2B | 94 / 100 | Lab 4C |
+
 ### Lab 0: [Warm-Up](http://web.cs.ucla.edu/classes/spring17/cs111/projects/P0.html)
 Trivial C program that copies content from a source to an output (defaults to copying stdin to stdout). Involved working with file descriptors and the getopt api for argument parsing. Also included an additional feature of catching and handling signals and segmentation faults.  
 
@@ -24,12 +32,3 @@ C programs used to analyze file system structure and diagnose possible corruptio
 ### Lab 4: [Bringup](http://web.cs.ucla.edu/classes/spring17/cs111/projects/P4A.html) / [Sensors and Communication](http://web.cs.ucla.edu/classes/spring17/cs111/projects/P4B.html) / [IOT Security](http://web.cs.ucla.edu/classes/spring17/cs111/projects/P4C.html)
 
 C programs for the Intel Edison that measures temperature through a temperature sensor and sending temperature reports to a server using both insecure and secure communication methods.
-
-
-Project | Score | Project | Score
----- | ---- | ---- | ----
-Lab 0 | 99 / 100 |  Lab 3A |
-Lab 1A | 96 / 100 | Lab 3B |
-Lab 1B | 89 / 100 | Lab 4A | 100 / 100
-Lab 2A | 90 / 100 | Lab 4B | 95 / 100
-Lab 2B | 94 / 100 | Lab 4C |

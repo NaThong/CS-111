@@ -141,8 +141,8 @@ int main(int argc, char **argv) {
 	// arguments this program supports
 	static struct option options[] = {
 		{"log", required_argument, 0, 'l'},
-        {"id", required_argument, 0, 'i'},
-        {"host", required_argument, 0, 'h'}
+	    {"id", required_argument, 0, 'i'},
+	    {"host", required_argument, 0, 'h'}
 	};
 
 	// iterate through options
@@ -150,68 +150,68 @@ int main(int argc, char **argv) {
 		switch (option) {
 			case 'l':
 				logFile = fopen(optarg, "w"); break;
-            case 'i':
-                id = optarg; break;
-            case 'h':
-                host = optarg; break;
+	        case 'i':
+	            id = optarg; break;
+	        case 'h':
+	            host = optarg; break;
 			default:
 				fprintf(stderr, "error: unrecognized argument\n");
 				exit(1);
 		}
 	}
 
-    // get port number (guaratneed to be last argument)
-    port = atoi(argv[argc - 1]);
+	// get port number (guaratneed to be last argument)
+	port = atoi(argv[argc - 1]);
 
-    // initialize SSL and context structure
-    OpenSSL_add_all_algorithms();
-    SSL_load_error_strings();
-    if (SSL_library_init() < 0) {
-        fprintf(stderr, "error: error in initializing OpenSSL library\n");
-        exit(1);
-    }
-    method = SSLv23_client_method();
-    if ((ctx = SSL_CTX_new(method)) == NULL) {
-        fprintf(stderr, "error: error in creating a new SSL context structure\n");
-        exit(1);
-    }
+	// initialize SSL and context structure
+	OpenSSL_add_all_algorithms();
+	SSL_load_error_strings();
+	if (SSL_library_init() < 0) {
+	    fprintf(stderr, "error: error in initializing OpenSSL library\n");
+	    exit(1);
+	}
+	method = SSLv23_client_method();
+	if ((ctx = SSL_CTX_new(method)) == NULL) {
+	    fprintf(stderr, "error: error in creating a new SSL context structure\n");
+	    exit(1);
+	}
 
-    // create new SSL based on context structure
-    ssl = SSL_new(ctx);
+	// create new SSL based on context structure
+	ssl = SSL_new(ctx);
 
-    // create a new socket and connect it to the host
-    socketFD = socket(AF_INET, SOCK_STREAM, 0);
-    if (socketFD < 0) {
-        fprintf(stderr, "error: error in opening socket\n");
-        exit(1);
-    }
-    server = gethostbyname(host);
-    if (server == NULL) {
-        fprintf(stderr, "error: error in finding host\n");
-        exit(1);
-    }
+	// create a new socket and connect it to the host
+	socketFD = socket(AF_INET, SOCK_STREAM, 0);
+	if (socketFD < 0) {
+	    fprintf(stderr, "error: error in opening socket\n");
+	    exit(1);
+	}
+	server = gethostbyname(host);
+	if (server == NULL) {
+	    fprintf(stderr, "error: error in finding host\n");
+	    exit(1);
+	}
 
-    // initialize socket connection
-    serverAddress.sin_family = AF_INET; // set address family
-    memcpy((char *)&serverAddress.sin_addr.s_addr, (char *)server->h_addr, server->h_length); // get ip address of server
-    serverAddress.sin_port = htons(port); // store port number
-    if (connect(socketFD, (struct sockaddr*) &serverAddress, sizeof(serverAddress)) < 0) {
-        fprintf(stderr, "error: error in connecting to server\n");
-        exit(1);
-    }
+	// initialize socket connection
+	serverAddress.sin_family = AF_INET; // set address family
+	memcpy((char *)&serverAddress.sin_addr.s_addr, (char *)server->h_addr, server->h_length); // get ip address of server
+	serverAddress.sin_port = htons(port); // store port number
+	if (connect(socketFD, (struct sockaddr*) &serverAddress, sizeof(serverAddress)) < 0) {
+	    fprintf(stderr, "error: error in connecting to server\n");
+	    exit(1);
+	}
 
-    // initialize SSL connection
-    SSL_set_fd(ssl, socketFD);
-    if (SSL_connect(ssl) != 1) {
-        fprintf(stderr, "error: error in building a SSL/TLS session\n");
-        exit(1);
-    }
+	// initialize SSL connection
+	SSL_set_fd(ssl, socketFD);
+	if (SSL_connect(ssl) != 1) {
+	    fprintf(stderr, "error: error in building a SSL/TLS session\n");
+	    exit(1);
+	}
 
-    // write ID
-    char idBuffer[50];
-    memset(idBuffer, 0, 50);
-    sprintf(idBuffer, "ID=%s\n", id);
-    SSL_write(ssl, idBuffer, strlen(idBuffer));
+	// write ID
+	char idBuffer[50];
+	memset(idBuffer, 0, 50);
+	sprintf(idBuffer, "ID=%s\n", id);
+	SSL_write(ssl, idBuffer, strlen(idBuffer));
 
 	// initialize temperature sensor at A0
 	mraa_aio_context temperatureSensor;
@@ -246,10 +246,10 @@ int main(int argc, char **argv) {
 		strftime(timeString, 10, "%H:%M:%S", timeInfo);
 
 		// print to socket and log file
-        char tempLogBuffer[20];
-        memset(tempLogBuffer, 0, 20);
-        sprintf(tempLogBuffer, "%s %.1f\n", timeString, processedTemperature);
-        SSL_write(ssl, tempLogBuffer, strlen(tempLogBuffer));
+		char tempLogBuffer[20];
+		memset(tempLogBuffer, 0, 20);
+		sprintf(tempLogBuffer, "%s %.1f\n", timeString, processedTemperature);
+		SSL_write(ssl, tempLogBuffer, strlen(tempLogBuffer));
 		if (logFile) {
 			fprintf(logFile, "%s %.1f\n", timeString, processedTemperature);
 		}
@@ -270,16 +270,15 @@ int main(int argc, char **argv) {
 			}
 
 			if ((pollfdArray[0].revents & POLLIN)) {
-                char commBuff[1024];
-                memset(commBuff, 0, 1024);
-                int charsRead = SSL_read(ssl, commBuff, 1024);
-                commBuff[strlen(commBuff) - 1] = '\0'; // remove newline char
-                handleCommand(commBuff);
+				char commBuff[1024];
+				memset(commBuff, 0, 1024);
+				int charsRead = SSL_read(ssl, commBuff, 1024);
+				commBuff[strlen(commBuff) - 1] = '\0'; // remove newline char
+				handleCommand(commBuff);
 			}
 
-            // sample new ending time
-			if (run)
-				time(&end);
+			// sample new ending time
+			if (run) time(&end);
 		}
 	}
 
