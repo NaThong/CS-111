@@ -4,11 +4,11 @@ My solutions for [UCLA CS 111 - Operating Systems Principles](http://web.cs.ucla
 
 Project | Score | Project | Score
 ---- | ---- | ---- | ----
-Lab 0 | 99 / 100 |  Lab 3A |
-Lab 1A | 96 / 100 | Lab 3B |
+Lab 0 | 99 / 100 |  Lab 3A | 87 / 100
+Lab 1A | 96 / 100 | Lab 3B | 96 / 100
 Lab 1B | 89 / 100 | Lab 4A | 100 / 100
 Lab 2A | 90 / 100 | Lab 4B | 95 / 100
-Lab 2B | 94 / 100 | Lab 4C |
+Lab 2B | 94 / 100 | Lab 4C | 99 / 100
 
 ### Lab 0: [Warm-Up](http://web.cs.ucla.edu/classes/spring17/cs111/projects/P0.html)
 Trivial C program that copies content from a source to an output (defaults to copying stdin to stdout). Involved working with file descriptors and the getopt api for argument parsing. Also included an additional feature of catching and handling signals and segmentation faults.  
